@@ -15,20 +15,124 @@ glimpse(domvio)
 ```
 
 ```{r mutate data to make month day year}
-domvio_mut<-domvio %>%
+domvio<-domvio %>%
   mutate(MONTH = substring(DATE..OF.OCCURRENCE, 0, 2)) %>% 
   mutate(DAY = substring(DATE..OF.OCCURRENCE, 4,5)) %>% 
   mutate(YEAR = substring(DATE..OF.OCCURRENCE, 7,10))
+
+glimpse(domvio)
+  
+```
+
+```{r making indicators}
+domvio_mut<-domvio
+
+#create an indicator for being in the lockdown
+#this indicator is "islockdown"
+domvio_mut<-domvio_mut %>%
+  filter(YEAR=="2020") %>% 
+  mutate(islockdown = case_when(
+    MONTH < "03" ~ 0, 
+    MONTH == "03" & DAY < "22" ~ 0,
+    MONTH == "03" & DAY >= "22" ~ 1,
+    MONTH == "04" ~ 1,
+    MONTH == "05" & DAY <= "29" ~ 1,
+    MONTH == "05" & DAY > "29" ~ 0,
+    MONTH > "05" ~ 0
+
+    ))
+
+#create an indicator for the recovery period
+#this indicator is "isrecovery"
+
+domvio_mut<-domvio_mut %>%
+  filter(YEAR=="2020") %>% 
+  mutate(isrecovery = case_when(
+    MONTH < "05" ~ 0,
+    MONTH == "05" & DAY <= "29" ~ 0,
+    MONTH == "05" & DAY > "29" ~ 1,
+    MONTH > "05" ~ 1
+
+    ))
+
+#create an indicator for years in 2020 pre covid
+#this indicator is "isprecovid"
+
+domvio_mut<-domvio_mut %>%
+  filter(YEAR=="2020") %>% 
+  mutate(isprecovid = case_when(
+    MONTH < "03" ~ 1, 
+    MONTH == "03" & DAY < "22" ~ 1,
+    MONTH == "03" & DAY >= "22" ~ 0,
+    MONTH > "04" ~ 0,
+
+    ))
+
+#create an indicator for years in 2019 to compare with 2020 pre covid
+#this indicator is "is2019compare"
+
+
+#create an indicator for cases of dom violence
+#this indicator is "isdomviolence"
+
+domvio_mut<-domvio_mut %>%
+  mutate(isdomviolence = case_when(
+    SECONDARY.DESCRIPTION == "DOMESTIC BATTERY SIMPLE" ~ 1,
+    SECONDARY.DESCRIPTION != "DOMESTIC BATTERY SIMPLE" ~ 0
+    ))
+
+#create an indicator for cases of dom violence
+#this indicator is "isdomviolence"
 
 glimpse(domvio_mut)
   
 ```
 
-```{r make indicators}
-domvio_mut<-domvio_mut %>%
-  filter(YEAR=="2020") %>% 
-  filter(MONTH > )
+```{r lookning at some data pointss}
+#number of observations during lockdown
+domvio_mut %>% 
+  count (islockdown)
 
-glimpse(domvio_mut)
-  
+#number of observations during recovery
+domvio_mut %>% 
+  count (isrecovery)
+
+#number of observations during in 2020 pre covid
+domvio_mut %>% 
+  count (isprecovid)
+
+
+#number of cases of domestic violence
+domvio_mut %>% 
+  count(isdomviolence)
+
+#see number of cases of domestic violence on a given day
+domvio_mut %>% 
+  filter(YEAR=="2020") %>% 
+  filter(MONTH=="05") %>% 
+  filter(DAY=="30") %>% 
+  count(isdomviolence)
+```
+
+
+```{r looking at 2019 compare}
+
+filter2019<-domvio %>%
+  filter(YEAR =="2019") 
+
+#number of observations during in 2019 period to compare with 2020
+filter2019<-filter2019 %>% 
+  mutate(iscompared = case_when(
+    MONTH < "03" ~ 1, 
+    MONTH == "03" & DAY < "22" ~ 1,
+    MONTH == "03" & DAY >= "22" ~ 0,
+    MONTH > "04" ~ 0,
+
+    ))
+
+glimpse(filter2019)
+
+filter2019 %>% 
+  count(iscompared)
+
 ```
