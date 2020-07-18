@@ -1,0 +1,10 @@
+---
+title: "Chicago Domestic Crimes During Pandemic"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+domvio <- read.csv("chicago.csv")
+
+```
