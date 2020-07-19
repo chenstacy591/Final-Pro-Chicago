@@ -135,4 +135,9 @@ glimpse(filter2019)
 filter2019 %>% 
   count(iscompared)
 
+#using this code you can see that there are no observations in #the month of 06, but in 07 you can see there are observations
+filter2019 %>% 
+  filter(MONTH=="06") %>% 
+  count(iscompared)
+
 ```
