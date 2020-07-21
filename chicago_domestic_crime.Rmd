@@ -12,13 +12,12 @@ library(tidyverse)
 
 ```{r mutate data to make month day year}
 domvio<-domvio %>%
-  mutate(MONTH = as.numeric(factor(substring(DATE..OF.OCCURRENCE, 0, 2)))) %>% 
-  mutate(DAY = as.numeric(factor(substring(DATE..OF.OCCURRENCE, 4,5)))) %>% 
-  mutate(YEAR = as.numeric(factor(substring(DATE..OF.OCCURRENCE, 7,10))))
+  mutate(MONTH = as.integer(substring(DATE..OF.OCCURRENCE, 0, 2))) %>% 
+  mutate(DAY = as.integer(substring(DATE..OF.OCCURRENCE, 4,5))) %>% 
+  mutate(YEAR = as.integer(substring(DATE..OF.OCCURRENCE, 7,10)))
 
 #heres what the data looks like
 glimpse(domvio)
-  
 ```
 
 
@@ -27,94 +26,105 @@ domvio_mut<-domvio
 
 #create an indicator for being before covid entirely
 #this indicator is "isbeforecovid"
+
 domvio_mut<-domvio_mut %>%
   mutate(isbeforecovid = case_when(
     YEAR == 2019 ~ 1,
-    YEAR == 2020 & MONTH == 01 & DAY <=24 ~ 1 ,
-    YEAR == 2020 & MONTH == 01 & DAY > 24 ~ 0,
-    YEAR == 2020 & MONTH > 1 ~ 0
+    YEAR == 2020 & MONTH == 1 & DAY <=24 ~ 1,
+    YEAR == 2020 & MONTH == 1 & DAY > 24 ~ 0,
+    YEAR == 2020 & MONTH > 1 ~ 0,
     ))
 
 #create an indicator for being before lockdown (tho covid is in the USA)
 #this indicator is "isprelockdown"
 domvio_mut<-domvio_mut %>%
-  mutate(isbeforecovid = case_when(
-    YEAR =="2019" ~ 0,
-    YEAR == "2020" & MONTH == "01" & DAY <=24 ~0,
-    YEAR == "2020" & MONTH == "01" & DAY > 24 ~ 1,
-    YEAR == "2020" & MONTH == "02"  ~ 1, 
-    YEAR == "2020"  & MONTH == "03" & DAY < "22" ~ 1,
-    YEAR == "2020"  & MONTH == "03" & DAY >= "22" ~ 0,
-    YEAR == "2020"  & MONTH > "03" ~ 0
+  mutate(isprelockdown = case_when(
+    YEAR == 2019 ~ 0,
+    YEAR == 2020 & MONTH == 1 & DAY <=24 ~ 0,
+    YEAR == 2020 & MONTH == 1 & DAY > 24 ~ 1,
+    YEAR == 2020 & MONTH == 2  ~ 1, 
+    YEAR == 2020 & MONTH == 3 & DAY < 22 ~ 1,
+    YEAR == 2020 & MONTH == 3 & DAY >= 22 ~ 0,
+    YEAR == 2020 & MONTH > 3 ~ 0
     ))
+
 #create an indicator for being in the lockdown
 #this indicator is "islockdown"
 domvio_mut<-domvio_mut %>%
   mutate(islockdown = case_when(
-    YEAR =="2019" ~ 0,
-    YEAR == "2020" & MONTH < "03" ~ 0, 
-    YEAR == "2020" & MONTH == "03" & DAY < "22" ~ 0,
-    YEAR == "2020" & MONTH == "03" & DAY >= "22" ~ 1,
-    YEAR == "2020" & MONTH == "04" ~ 1,
-    YEAR == "2020" & MONTH == "05" & DAY <= "29" ~ 1,
-    YEAR == "2020" & MONTH == "05" & DAY > "29" ~ 0,
-    YEAR == "2020" & MONTH > "05" ~ 0
-
+    YEAR == 2019 ~ 0,
+    YEAR == 2020 & MONTH < 3 ~ 0, 
+    YEAR == 2020 & MONTH == 3 & DAY < 22 ~ 0,
+    YEAR == 2020 & MONTH == 3 & DAY >= 22 ~ 1,
+    YEAR == 2020 & MONTH == 4 ~ 1,
+    YEAR == 2020 & MONTH >= 5 ~ 0
     ))
 
-#create an indicator for the recovery period
-#this indicator is "isrecovery"
-
+#create an indicator for phase 2 in the recovery
+#this indicator is "isphase2"
 domvio_mut<-domvio_mut %>%
   mutate(isrecovery = case_when(
-    YEAR =="2019" ~ 0,
-    YEAR == "2020" & MONTH < "05" ~ 0,
-    YEAR == "2020" & MONTH == "05" & DAY <= "29" ~ 0,
-    YEAR == "2020" & MONTH == "05" & DAY > "29" ~ 1,
-    YEAR == "2020" & MONTH > "05" ~ 1
-
+    YEAR == 2019 ~ 0,
+    YEAR == 2020 & MONTH < 5 ~ 0, 
+    YEAR == 2020 & MONTH == 5 ~ 1,
+    YEAR == 2020 & MONTH == 6 & DAY < 3 ~ 1,
+    YEAR == 2020 & MONTH == 6 & DAY >= 3 ~ 0,
+    YEAR == 2020 & MONTH >= 7 ~ 0
     ))
 
 #create an indicator for phase 3 in the recovery
 #this indicator is "isphase3"
-
 domvio_mut<-domvio_mut %>%
   mutate(isphase3 = case_when(
-    YEAR =="2019" ~ 0,
-    YEAR == "2020" & MONTH < "06" ~ 0,
-    YEAR == "2020" & MONTH == "06" & DAY < "03" ~ 0,
-    YEAR == "2020" & MONTH == "06" & DAY >= "03" & DAY < "26" ~ 1,
-    YEAR == "2020" & MONTH == "06" &  DAY >= "26" ~ 0,
-    YEAR == "2020" & MONTH > "06" ~ 0
-
+    YEAR == 2019 ~ 0,
+    YEAR == 2020 & MONTH < 6 ~ 0, 
+    YEAR == 2020 & MONTH == 6 & DAY >= 3 & DAY <= 25 ~ 1,
+    YEAR == 2020 & MONTH == 6 & DAY > 25 ~ 0,
+    YEAR == 2020 & MONTH >= 7 ~ 0
     ))
 
 #create an indicator for phase 4 in the recovery
 #this indicator is "isphase4"
-
 domvio_mut<-domvio_mut %>%
   mutate(isphase4 = case_when(
-    YEAR =="2019" ~ 0,
-    YEAR == "2020" & MONTH < "06" ~ 0,
-        YEAR == "2020" & MONTH == "06" & DAY < "26" ~ 0,
-    YEAR == "2020" & MONTH == "06" & DAY >= "26"~ 1,
-    YEAR == "2020" & MONTH >"06" ~ 1
-
+    YEAR == 2019 ~ 0,
+    YEAR == 2020 & MONTH < 6 ~ 0, 
+    YEAR == 2020 & MONTH == 6 & DAY < 26 ~ 0,
+    YEAR == 2020 & MONTH == 6 & DAY >= 26 ~ 1,
+    YEAR == 2020 & MONTH >= 7 ~ 1
     ))
+  
 #create an indicator for cases of dom violence
 #this indicator is "isdomviolence"
-
 domvio_mut<-domvio_mut %>%
   mutate(isdomviolence = case_when(
-    SECONDARY.DESCRIPTION == "DOMESTIC BATTERY SIMPLE" ~ 1,
-    SECONDARY.DESCRIPTION != "DOMESTIC BATTERY SIMPLE" ~ 0
+    SECONDARY.DESCRIPTION == "VIOLATION OF BAIL BOND - DOMESTIC VIOLENCE" |
+    SECONDARY.DESCRIPTION == "DOMESTIC BATTERY SIMPLE" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY: OTHER DANGEROUS WEAPON" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY: OTHER DANG WEAPON" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY: KNIFE/CUTTING INST" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY: KNIFE / CUTTING INSTSTRUMENT" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY: HANDS/FIST/FEET SERIOUS INJURY" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY: HANDGUN" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY - OTHER FIREARM" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY - OTHER DANGEROUS WEAPON" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY - KNIFE / CUTTING INSTRUMENT" |
+    SECONDARY.DESCRIPTION == "AGGRAVATED DOMESTIC BATTERY - HANDGUN" |
+    SECONDARY.DESCRIPTION == "AGG. DOMESTIC BATTERY - HANDS, FISTS, FEET, SERIOUS INJURY" ~ 1,
+    SECONDARY.DESCRIPTION != "VIOLATION OF BAIL BOND - DOMESTIC VIOLENCE" &
+    SECONDARY.DESCRIPTION != "DOMESTIC BATTERY SIMPLE" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY: OTHER DANGEROUS WEAPON" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY: OTHER DANG WEAPON" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY: KNIFE/CUTTING INST" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY: KNIFE / CUTTING INSTSTRUMENT" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY: HANDS/FIST/FEET SERIOUS INJURY" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY: HANDGUN" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY - OTHER FIREARM" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY - OTHER DANGEROUS WEAPON" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY - KNIFE / CUTTING INSTRUMENT" &
+    SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY - HANDGUN" &
+    SECONDARY.DESCRIPTION != "AGG. DOMESTIC BATTERY - HANDS, FISTS, FEET, SERIOUS INJURY" ~ 0
     ))
-
-#create an indicator for cases of dom violence
-#this indicator is "isdomviolence"
-
-glimpse(domvio_mut)
-  
 ```
 
 ```{r lookning at some data pointsss}
@@ -154,4 +164,10 @@ domvio_mut %>%
   filter(YEAR=="2019") %>% 
   filter(MONTH=="07") %>%
   count(isdomviolence)
+```
+```{r check}
+domvio_cat<-domvio_mut %>%
+  group_by(SECONDARY.DESCRIPTION) %>%
+  summarise(n=n())
+domvio_cat
 ```
