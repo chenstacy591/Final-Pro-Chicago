@@ -171,3 +171,22 @@ domvio_cat<-domvio_mut %>%
   summarise(n=n())
 domvio_cat
 ```
+
+```{r creating this indicator that shows before covid, during lockdown, and phase 3 together}
+domvio_mut<-domvio_mut %>% 
+  mutate(chisquare_indicators= case_when(isbeforecovid == 1 ~ "pre",
+                                         isprelockdown == 1 ~ "pre",
+                                         islockdown == 1 ~ "lockdown",
+                                         isrecovery == 1 ~ "lockdown",
+                                         isphase3 == 1 ~ "post",
+                                         isphase4 == 1 ~ "post"
+                                         ) )
+domvio_mut
+```
+
+```{r chisquared test}
+table(domvio_mut$isdomviolence, domvio_mut$chisquare_indicators)
+chisq.test(table(domvio_mut$isdomviolence, domvio_mut$chisquare_indicators))
+
+
+```
