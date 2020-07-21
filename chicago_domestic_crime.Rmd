@@ -4,10 +4,9 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F)
 domvio <- read.csv("chicago.csv")
 library(tidyverse)
-
 ```
 
 
@@ -29,10 +28,10 @@ domvio_mut<-domvio
 #this indicator is "isbeforecovid"
 domvio_mut<-domvio_mut %>%
   mutate(isbeforecovid = case_when(
-    YEAR =="2019" ~ 1,
-    YEAR == "2020" & MONTH == "01" & DAY <=24 ~ 1 ,
-    YEAR == "2020" & MONTH == "01" & DAY > 24 ~ 0,
-    YEAR == "2020" & MONTH > "01" ~ 0
+    YEAR == 2019 ~ 1,
+    YEAR == 2020 & MONTH == 01 & DAY <=24 ~ 1 ,
+    YEAR == 2020 & MONTH == 01 & DAY > 24 ~ 0,
+    YEAR == 2020 & MONTH > 1 ~ 0
     ))
 
 #create an indicator for being before lockdown (tho covid is in the USA)
