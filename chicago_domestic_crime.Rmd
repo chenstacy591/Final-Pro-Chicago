@@ -12,14 +12,15 @@ library(tidyverse)
 
 ```{r mutate data to make month day year}
 domvio<-domvio %>%
-  mutate(MONTH = substring(DATE..OF.OCCURRENCE, 0, 2)) %>% 
-  mutate(DAY = substring(DATE..OF.OCCURRENCE, 4,5)) %>% 
-  mutate(YEAR = substring(DATE..OF.OCCURRENCE, 7,10))
+  mutate(MONTH = as.numeric(factor(substring(DATE..OF.OCCURRENCE, 0, 2)))) %>% 
+  mutate(DAY = as.numeric(factor(substring(DATE..OF.OCCURRENCE, 4,5)))) %>% 
+  mutate(YEAR = as.numeric(factor(substring(DATE..OF.OCCURRENCE, 7,10))))
 
 #heres what the data looks like
 glimpse(domvio)
   
 ```
+
 
 ```{r making indicators}
 domvio_mut<-domvio
