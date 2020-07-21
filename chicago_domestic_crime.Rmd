@@ -1,32 +1,41 @@
 ---
 title: "Chicago Domestic Crimes During Pandemic"
 output: pdf_document
+author: Samuel, Natalie, & Stacy
 ---
+
+## INTRODUCTION AND DATA
+-introduce your general research question and your data (where it came from, how it was collected, what are the cases, what are the variables, etc.).
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message=F, warning=F)
-domvio <- read.csv("chicago.csv")
+domvio <- read.csv("data/chicago.csv")
 library(tidyverse)
 ```
 
+## METHODOLOGY
+-variables used to address your research question
+-useful visualizations or summary statistics
+-introduce and justify the statistical method(s) that you believe will be useful in answering your research question.
 
-```{r mutate data to make month day year}
+```{r mutate original data to make month day year variables}
 domvio<-domvio %>%
   mutate(MONTH = as.integer(substring(DATE..OF.OCCURRENCE, 0, 2))) %>% 
   mutate(DAY = as.integer(substring(DATE..OF.OCCURRENCE, 4,5))) %>% 
   mutate(YEAR = as.integer(substring(DATE..OF.OCCURRENCE, 7,10)))
 
-#heres what the data looks like
+#here's what the data looks like
 glimpse(domvio)
 ```
 
 
-```{r making indicators}
+```{r making mutated dataset for new indicators}
 domvio_mut<-domvio
+```
 
+```{r beforecovid-indicator}
 #create an indicator for being before covid entirely
-#this indicator is "isbeforecovid"
-
+#this indicator is "isbeforecovid" 2019/7/10-2020/1/24 
 domvio_mut<-domvio_mut %>%
   mutate(isbeforecovid = case_when(
     YEAR == 2019 ~ 1,
@@ -34,9 +43,11 @@ domvio_mut<-domvio_mut %>%
     YEAR == 2020 & MONTH == 1 & DAY > 24 ~ 0,
     YEAR == 2020 & MONTH > 1 ~ 0,
     ))
+```
 
+```{r prelockdown-indicator}
 #create an indicator for being before lockdown (tho covid is in the USA)
-#this indicator is "isprelockdown"
+#this indicator is "isprelockdown" 2020/1/25-2020/3/21
 domvio_mut<-domvio_mut %>%
   mutate(isprelockdown = case_when(
     YEAR == 2019 ~ 0,
@@ -47,9 +58,11 @@ domvio_mut<-domvio_mut %>%
     YEAR == 2020 & MONTH == 3 & DAY >= 22 ~ 0,
     YEAR == 2020 & MONTH > 3 ~ 0
     ))
+```
 
+```{r lockdown-indicator}
 #create an indicator for being in the lockdown
-#this indicator is "islockdown"
+#this indicator is "islockdown" 2020/3/22-2020/4/30
 domvio_mut<-domvio_mut %>%
   mutate(islockdown = case_when(
     YEAR == 2019 ~ 0,
@@ -59,11 +72,13 @@ domvio_mut<-domvio_mut %>%
     YEAR == 2020 & MONTH == 4 ~ 1,
     YEAR == 2020 & MONTH >= 5 ~ 0
     ))
+```
 
+```{r phase2-indicator}
 #create an indicator for phase 2 in the recovery
-#this indicator is "isphase2"
+#this indicator is "isphase2" 2020/5/1-2020/6/2
 domvio_mut<-domvio_mut %>%
-  mutate(isrecovery = case_when(
+  mutate(isphase2 = case_when(
     YEAR == 2019 ~ 0,
     YEAR == 2020 & MONTH < 5 ~ 0, 
     YEAR == 2020 & MONTH == 5 ~ 1,
@@ -71,20 +86,25 @@ domvio_mut<-domvio_mut %>%
     YEAR == 2020 & MONTH == 6 & DAY >= 3 ~ 0,
     YEAR == 2020 & MONTH >= 7 ~ 0
     ))
+```
 
+```{r phase3-indicator}
 #create an indicator for phase 3 in the recovery
-#this indicator is "isphase3"
+#this indicator is "isphase3" 2020/6/3-2020/6/25
 domvio_mut<-domvio_mut %>%
   mutate(isphase3 = case_when(
     YEAR == 2019 ~ 0,
     YEAR == 2020 & MONTH < 6 ~ 0, 
+    YEAR == 2020 & MONTH == 6 & DAY < 3 ~ 0,
     YEAR == 2020 & MONTH == 6 & DAY >= 3 & DAY <= 25 ~ 1,
     YEAR == 2020 & MONTH == 6 & DAY > 25 ~ 0,
     YEAR == 2020 & MONTH >= 7 ~ 0
     ))
+```
 
+```{r phase4-indicator}
 #create an indicator for phase 4 in the recovery
-#this indicator is "isphase4"
+#this indicator is "isphase4" 2020/6/26-2020/7/8 (last day on dataset)
 domvio_mut<-domvio_mut %>%
   mutate(isphase4 = case_when(
     YEAR == 2019 ~ 0,
@@ -93,7 +113,15 @@ domvio_mut<-domvio_mut %>%
     YEAR == 2020 & MONTH == 6 & DAY >= 26 ~ 1,
     YEAR == 2020 & MONTH >= 7 ~ 1
     ))
-  
+```
+
+```{r domvio-indicator}
+#find which labels have to do with domestic violence
+domvio_cat<-domvio_mut %>%
+  group_by(SECONDARY.DESCRIPTION) %>%
+  summarise(n=n())
+domvio_cat
+
 #create an indicator for cases of dom violence
 #this indicator is "isdomviolence"
 domvio_mut<-domvio_mut %>%
@@ -127,66 +155,91 @@ domvio_mut<-domvio_mut %>%
     ))
 ```
 
-```{r lookning at some data pointsss}
+```{r cases-per-covidphase}
 #if you are wondering about how the actual data looks like there it is
-#number of observations during lockdown
-domvio_mut %>% 
-  count (islockdown)
 
-#number of observations during recovery
-domvio_mut %>% 
-  count (isrecovery)
-
-#number of observations during p3, p4
-domvio_mut %>% 
-  count (isphase3)
-domvio_mut %>% 
-  count(isphase4)
-
-#number of observations during in 2020 pre covid
+#number of observations during in 2020 pre covid=140697
 domvio_mut %>% 
   count (isbeforecovid)
 
+#number of observations during prelockdown=34619
+domvio_mut %>% 
+  count (isprelockdown)
 
-#number of cases of domestic violence
+#number of observations during lockdown=16842
+domvio_mut %>% 
+  count (islockdown)
+
+#number of observations during p2=18578
+domvio_mut %>% 
+  count (isphase2)
+
+#number of observations during p3=12722
+domvio_mut %>% 
+  count (isphase3)
+
+#number of observations during p4=7544
+domvio_mut %>% 
+  count(isphase4)
+
+#number of cases of domestic violence=24897
 domvio_mut %>% 
   count(isdomviolence)
+```
 
+``` {r cases-per-day-or-month}
 #see number of cases of domestic violence on a given day
 domvio_mut %>% 
-  filter(YEAR=="2020") %>% 
-  filter(MONTH=="05") %>% 
-  filter(DAY=="30") %>% 
+  filter(YEAR==2019) %>% 
+  filter(MONTH==7) %>% 
+  filter(DAY==9) %>% 
   count(isdomviolence)
 
-#observations of dom violence on a day or month
+#observations of domestic violence in a given month
 domvio_mut %>% 
-  filter(YEAR=="2019") %>% 
-  filter(MONTH=="07") %>%
+  filter(YEAR==2019) %>% 
+  filter(MONTH==07) %>%
   count(isdomviolence)
 ```
-```{r check}
-domvio_cat<-domvio_mut %>%
-  group_by(SECONDARY.DESCRIPTION) %>%
-  summarise(n=n())
-domvio_cat
-```
 
-```{r creating this indicator that shows before covid, during lockdown, and phase 3 together}
+
+```{r creating chisquare_indicators that shows before covid, during lockdown, and phase 3 together}
 domvio_mut<-domvio_mut %>% 
   mutate(chisquare_indicators= case_when(isbeforecovid == 1 ~ "pre",
                                          isprelockdown == 1 ~ "pre",
                                          islockdown == 1 ~ "lockdown",
-                                         isrecovery == 1 ~ "lockdown",
+                                         isphase2 == 1 ~ "lockdown",
                                          isphase3 == 1 ~ "post",
                                          isphase4 == 1 ~ "post"
                                          ) )
-domvio_mut
 ```
+
+## RESULTS
+-Showcase how 
+-Provide the main results from your analysis
+
+#### Chi-Square Test
 
 ```{r chisquared test}
 table(domvio_mut$isdomviolence, domvio_mut$chisquare_indicators)
 chisq.test(table(domvio_mut$isdomviolence, domvio_mut$chisquare_indicators))
-
-
 ```
+
+Since the data (Table 1) satisfies the independent sampling assumption and is large enough (i.e. each cell > 10), we will be performing a chi-square test at the $\alpha$  = 0.05 significance level. We test the two hypotheses below: 
+
+H0 : The frequency of domestic violence cases in Chicago is unrelated to the phases of the pandemic.
+H1 : The frequency of domestic violence cases in Chicago is related to the phases of the pandemic.
+
+Under the null hypothesis, our test statistic has a chi-square distribution with 2 degrees of freedom. We performed the test and obtained a chi-square value of 247.63, which corresponds to a p-value of < 0.001. Thus, at an $\alpha$ = 0.05 significance level, we reject the null hypothesis; there is sufficient evidence to suggest that the frequency of domestic violence cases in Chicago is related to the phases of the pandemic.
+
+#### Step Down 2 Proportion Z-Tests
+-with Bonferroni correction
+
+#### Regression Analysis
+
+## DISCUSSION
+-summary of what you have learned about your research question along
+-statistical arguments supporting your conclusions
+-critique your own methods and provide suggestions for improving your analysis (Issues pertaining to the reliability and validity of your data and appropriateness of the statistical analysis)
+-what you would do differently
+-what you would do next if you were going to continue work on the project
