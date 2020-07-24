@@ -21,8 +21,8 @@ LOCATION: (latitude, longitude) of crime location
 MONTH: Month of the crime
 DAY: Day of the month of the crime
 YEAR: Year of the crime
+DATEINT: Date as integer in the format YYYYMM
 isbeforecovid: Indicator value for if crime happened before COVID-19 hit Chicago (2019/7/10-2020/1/24) 0=no; 1=yes
-DATEINT: Date as integer in the format YYYYMMDD
 isprelockdown: Indicator value for if crime happened after COVID-19 hit Chicago and before stay-at-home orders (2020/1/25-2020/3/21) 0=no; 1=yes
 islockdown: Indicator value for if crime happened during strict stay-at-home orders (2020/3/22-2020/4/30) 0=no; 1=yes
 isphase2: Indicator value for if crime happened during phase 2 of the pandemic (2020/5/1-2020/6/2) 0=no; 1=yes

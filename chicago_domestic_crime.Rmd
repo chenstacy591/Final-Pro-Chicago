@@ -24,7 +24,7 @@ domvio<-domvio %>%
   mutate(MONTH = substring(DATE..OF.OCCURRENCE, 0, 2)) %>% 
   mutate(DAY = substring(DATE..OF.OCCURRENCE, 4,5)) %>% 
   mutate(YEAR = substring(DATE..OF.OCCURRENCE, 7,10)) %>%
-  mutate(DATEINT = as.integer(paste(YEAR, MONTH, DAY, sep=""))) %>%
+  mutate(DATEINT = as.integer(paste(YEAR, MONTH, sep=""))) %>%
   mutate(MONTH = as.integer(substring(DATE..OF.OCCURRENCE, 0, 2))) %>% 
   mutate(DAY = as.integer(substring(DATE..OF.OCCURRENCE, 4,5))) %>% 
   mutate(YEAR = as.integer(substring(DATE..OF.OCCURRENCE, 7,10)))
@@ -224,7 +224,26 @@ domvio_mut<-domvio_mut %>%
 -Provide the main results from your analysis
 
 ```{r domestic-vs-time}
-table(domvio_mut$DATEINT, domvio_mut$isdomviolence)
+domvio_day<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence))
+
+domvio_1<-domvio_day %>%
+  filter (Var2 == 1) %>%
+  pull()
+
+domvio_day<-domvio_day %>%
+  mutate (NONDOMVIO = Freq) %>%
+  filter (Var2 == 0) %>%
+  mutate (DOMVIOCASES = domvio_1) %>%
+  select (-Var2, -Freq) %>%
+  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
+  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
+
+ggplot(data = domvio_day, mapping = aes(x = Var1, y = PROPDOMVIO, group=1)) + geom_line()+ geom_point() +
+labs(title = "Monthly domestic violence proportion seem to have shot up in March, when Chicago issued stay-at-home orders",
+       x = "Year and Month (YYYYMM)",
+       y = "Prop of reported crime that was domestic violence")
+
+
 ```
 
 #### Chi-Square Test
