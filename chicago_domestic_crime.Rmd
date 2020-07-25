@@ -288,8 +288,43 @@ We found that all three pairwise difference in proportions are significant at th
 
 #### Regression Analysis
 
-```{r logistic regression model}
-domvio_mod <- lm()
+```{r logistic-var}
+#Creating new dummy variables to use as indicators
+library(broom)
+domvio_mut <-domvio_mut %>% 
+  mutate(pandemic_time = case_when(isbeforecovid == 1 ~ "before_covid",
+                                         isprelockdown == 1 ~ "pre-lockdown",
+                                         islockdown == 1 ~ "lockdown",
+                                         isphase2 == 1 ~ "phase 2",
+                                         isphase3 == 1 ~ "phase 3",
+                                         isphase4 == 1 ~ "phase 4"
+                                         ))
+
+#Create logistic regression model with outcome as domestic violence case yes or no against timeframe relative to the pandemic and lockdown/reopening periods
+domvio_mod <- glm(isdomviolence ~ pandemic_time, data = domvio_mut, 
+                  family = "binomial")
+
+#View model output
+tidy(domvio_mod)
+
+```
+Our logistic regression model corresponding to the probability of success that a reported crime for a given time period will be one of domestic violence is as follows: 
+
+$\hat{\beta}_0$ + $\hat{\beta}_1$(pandemic_time == lockdown) + $\hat{\beta}_2$(pandemic_time == phase 2) + $\hat{\beta}_3$(pandemic_time == phase 3) + $\hat{\beta}_4$(pandemic_time == phase 4) + $\hat{\beta}_5$(pandemic_time == pre-lockdown) 
+
+At the $\alpha$ = 0.05 significance level, the true $\beta$ coefficients corresponding to the logit of the probability that a case reported during that time period was related to domestic violence for each of our dummy variables (all relative to the baseline/reference category of before the COVID-19 pandemic) were statistically significant. We were specifically interested in $\beta_1$, which corresponds to the logit of the probability of success (that a reported case was related to domestic violence) during lockdown, as compared to before the pandeimc began, and whether there was a relationship between the probability of a reported crime being related to domestic violence during lockdown, when compared to before the pandemic. 
+
+H~0~: $\beta_1$ = 0 (There is no relationship between our predictor and the probability of success that a reported case is related to domestic violence, while holding all other variables constant. The true population parameter $\beta_1$ is equal to 0).  
+
+H~1~: (There is a relationship between our predictor and the probability of success that a reported case is related to domestic violence, while holding all other variables constant. The true population parameter $\beta_1$ is not equal to 0).
+
+Under the null hypothesis, our test statistic follows a standard normal distribution, and is equal to approximatley 
+
+
+```{r regression analysis pt 2}
+augment(domvio_mod) %>%
+  select(isdomviolence, pandemic_time, .fitted) %>% 
+  mutate(pred_prob = exp(.fitted)/(1 + exp(.fitted)))
 
 ```
 
