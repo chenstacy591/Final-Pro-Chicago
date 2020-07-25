@@ -318,9 +318,23 @@ H~0~: $\beta_1$ = 0 (There is no relationship between our predictor and the prob
 
 H~1~: (There is a relationship between our predictor and the probability of success that a reported case is related to domestic violence, while holding all other variables constant. The true population parameter $\beta_1$ is not equal to 0).
 
-Under the null hypothesis, our test statistic follows a standard normal distribution. The value of our test statistic is equal to approximately 12.426, which corresponds to a p-value of less than 0.001. Thus, at the $\alpha$ = 0.05, we reject our null hypothesis; we have sufficient evidence to suggest that the true value of $\beta_1$ is not equal to 0, such that this predictor tells us soemthing about the probability of success of our outcome, while holding all other variables constant.  
+Under the null hypothesis, our test statistic follows a standard normal distribution. The value of our test statistic is equal to approximately 12.426, which corresponds to a p-value of less than 0.001. Thus, at the $\alpha$ = 0.05, we reject our null hypothesis; we have sufficient evidence to suggest that the true value of $\beta_1$ is not equal to 0, such that this predictor tells us something about the probability of success of our outcome, while holding all other variables constant.  
 
-We see from the model output above that the estimated $\hat{\beta}_1$ coefficent, corresponding to the effect of being in the "lockdown" phase of time in quarantine - relative to the time period before COVID-19 - on the probability of success that a reported case will be related to domestic violence, is approximately 0.303. This corresponds to an odds ratio of exp(0.303), which is approximately 1.354. Therefore, we would expect crimes reported during the lockdown phase of the stay-at-home order in the city of Chicago to have 1.354 times the odds of being related to domestic violence, relative to cases that were reported before the COVID-19 pandemic began, while holding all other variables constant. 
+We see from the model output above that the estimated $\hat{\beta}_1$ coefficent, corresponding to the effect of being in the "lockdown" phase of time in quarantine - relative to the time period before COVID-19 - on the probability of success that a reported case will be related to domestic violence, is approximately 0.303. This corresponds to an odds ratio of exp(0.303), which is approximately 1.354. Therefore, we would expect crimes reported during the lockdown phase of the stay-at-home order in the city of Chicago to have 1.354 times the odds of being related to domestic violence, relative to cases that were reported before the COVID-19 pandemic began. 
+
+```{r odds ratio of predicted terms}
+odds_lockdown <- exp(0.303)
+odds_lockdown
+odds_phase2 <- exp(0.111)
+odds_phase2
+odds_phase3 <- exp(0.309)
+odds_phase3
+odds_phase4 <- exp(0.272)
+odds_phase4
+odds_prelockdown <- exp(0.047)
+odds_prelockdown
+
+```
 
 
 ```{r regression analysis pt 2}
