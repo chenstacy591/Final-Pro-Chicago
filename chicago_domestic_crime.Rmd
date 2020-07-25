@@ -5,6 +5,14 @@ author: Samuel, Natalie, & Stacy
 ---
 
 ## INTRODUCTION AND DATA
+
+Safer at home? Domestic Violence During the COVID-19 Pandemic
+
+In what has been dubbed “a pandemic within a pandemic,” a new public health crisis has emerged in the wake of the coronavirus - increasing rates of domestic violence, affecting those in abusive relationships around the globe. This trend is not necessarily surprising, since rates of domestic violence tend to increase whenever families spend more time together - such as during Christmas and summer vacations - according to Bristol University sociologist Marianne Hester, but still troubling nonetheless, especially in countries (like the United States) where the virus doesn’t seem to be disappearing anytime soon. Without a strong support network due to social distancing and lockdown restrictions, it is much more difficult for victims of domestic violence to get help or escape (quarantined in their home), while the situation also enables the abuser by giving them greater power and control over what their partner can and can not do - suggesting that perhaps not everyone is truly “safer at home.” 
+
+In order to further investigate the rate of domestic violence during COVID-19, we decided to pulled existing data from the City of Chicago Data Portal, which contains data related to reported incidents of crime (with the exception of murders where data exists for each victim) that occurred in the City of Chicago from 2001 to present. The data contained in this dataset were extracted from the Chicago Police Department's CLEAR (Citizen Law Enforcement Analysis and Reporting) system.
+
+
 -introduce your general research question and your data (where it came from, how it was collected, what are the cases, what are the variables, etc.).
 -Define what we mean by domestic violence
 
