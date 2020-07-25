@@ -276,9 +276,15 @@ prop.test(x=c(4311,17919),n=c(35420, 17919+157397), alternative="two.sided", con
 
 .05/3
 ```
-We found that all three pairwise difference in proportions are significant at the adjusted siginficance level.
+We found that all three pairwise difference in proportions are significant at the adjusted significance level.
 
 #### Regression Analysis
+
+```{r logistic regression model}
+domvio_mod <- lm()
+
+```
+
 
 ## DISCUSSION
 -summary of what you have learned about your research question along
