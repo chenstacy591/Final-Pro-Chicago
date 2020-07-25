@@ -227,13 +227,14 @@ chisq.test(table(domvio_mut$isdomviolence, domvio_mut$chisquare_indicators))
 
 Since the data (Table 1) satisfies the independent sampling assumption and is large enough (i.e. each cell > 10), we will be performing a chi-square test at the $\alpha$  = 0.05 significance level. We test the two hypotheses below: 
 
-H0 : The frequency of domestic violence cases in Chicago is unrelated to the phases of the pandemic.
-H1 : The frequency of domestic violence cases in Chicago is related to the phases of the pandemic.
+H~0 : The frequency of domestic violence cases in Chicago is unrelated to the phases of the pandemic.
+H~1 : The frequency of domestic violence cases in Chicago is related to the phases of the pandemic.
 
 Under the null hypothesis, our test statistic has a chi-square distribution with 2 degrees of freedom. We performed the test and obtained a chi-square value of 247.63, which corresponds to a p-value of < 0.001. Thus, at an $\alpha$ = 0.05 significance level, we reject the null hypothesis; there is sufficient evidence to suggest that the frequency of domestic violence cases in Chicago is related to the phases of the pandemic.
 
 #### Step Down 2 Proportion Z-Tests
--with Bonferroni correction
+
+
 
 #### Regression Analysis
 
