@@ -380,7 +380,7 @@ upper_p4
 -summary of what you have learned about your research question along
 -statistical arguments supporting your conclusions
 -critique your own methods and provide suggestions for improving your analysis (Issues pertaining to the reliability and validity of your data and appropriateness of the statistical analysis)
-Make sure to mention possible confounders we did not include in our model, perhaps also the fact that we were just looking at Chicago, vs. the US as a whole or even multiple countires.
+Make sure to mention possible confounders we did not include in our model, perhaps also the fact that we were just looking at Chicago, vs. the US as a whole or even multiple countries.
 -what you would do differently
 -what you would do next if you were going to continue work on the project
 Are rates of domestic violence during lockdown different in different parts of the world and/or US?
