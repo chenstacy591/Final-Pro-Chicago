@@ -1,5 +1,5 @@
 ---
-title: "Chicago Domestic Crimes During Pandemic"
+title: "Safer at home? Domestic Violence During the COVID-19 Pandemic"
 output: pdf_document
 author: Samuel, Natalie, & Stacy
 ---
@@ -32,10 +32,17 @@ domvio<-domvio %>%
   mutate(MONTH = substring(DATE..OF.OCCURRENCE, 0, 2)) %>% 
   mutate(DAY = substring(DATE..OF.OCCURRENCE, 4,5)) %>% 
   mutate(YEAR = substring(DATE..OF.OCCURRENCE, 7,10)) %>%
-  mutate(DATEINT = as.integer(paste(YEAR, MONTH, sep=""))) %>%
+  mutate(DATEINT = as.integer(paste(YEAR, MONTH,sep=""))) %>%
   mutate(MONTH = as.integer(substring(DATE..OF.OCCURRENCE, 0, 2))) %>% 
   mutate(DAY = as.integer(substring(DATE..OF.OCCURRENCE, 4,5))) %>% 
   mutate(YEAR = as.integer(substring(DATE..OF.OCCURRENCE, 7,10)))
+  
+
+domvio<-domvio %>% 
+  mutate(isPM = case_when(substring(DATE..OF.OCCURRENCE,21,22) == "AM" ~ 0,
+                          substring(DATE..OF.OCCURRENCE,21,22) == "PM" ~ 1))
+domvio<- domvio %>% 
+  mutate(HOUR = as.integer(substring(DATE..OF.OCCURRENCE, 12,13)))
 
 #here's what the data looks like
 glimpse(domvio)
@@ -166,6 +173,20 @@ domvio_mut<-domvio_mut %>%
     SECONDARY.DESCRIPTION != "AGGRAVATED DOMESTIC BATTERY - HANDGUN" &
     SECONDARY.DESCRIPTION != "AGG. DOMESTIC BATTERY - HANDS, FISTS, FEET, SERIOUS INJURY" ~ 0
     ))
+```
+
+```{r indicator for it being in the 9am-5pm period}
+domvio_mut<-domvio_mut %>%
+  mutate(is9_5 = case_when(
+    isPM == 0 & HOUR <= 8 | HOUR == 12 ~0,
+    isPM == 0 & HOUR > 8 & HOUR !=12 ~ 1,
+    isPM == 1 & HOUR <6 | HOUR ==12 ~ 1,
+    isPM == 1 & HOUR >=6 & HOUR != 12 ~ 0
+    
+  ))
+
+glimpse(domvio_mut)
+
 ```
 
 ```{r cases-per-covidphase}
@@ -301,7 +322,7 @@ domvio_mut <-domvio_mut %>%
                                          ))
 
 #Create logistic regression model with outcome as domestic violence case yes or no against timeframe relative to the pandemic and lockdown/reopening periods
-domvio_mod <- glm(isdomviolence ~ pandemic_time, data = domvio_mut, 
+domvio_mod <- glm(isdomviolence ~ pandemic_time+as.factor(is9_5), data = domvio_mut, 
                   family = "binomial")
 
 #View model output
