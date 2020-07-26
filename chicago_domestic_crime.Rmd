@@ -323,6 +323,8 @@ Under the null hypothesis, our test statistic follows a standard normal distribu
 We see from the model output above that the estimated $\hat{\beta}_1$ coefficent, corresponding to the effect of being in the "lockdown" phase of time in quarantine - relative to the time period before COVID-19 - on the probability of success that a reported case will be related to domestic violence, is approximately 0.303. This corresponds to an odds ratio of exp(0.303), which is approximately 1.354. Therefore, we would expect crimes reported during the lockdown phase of the stay-at-home order in the city of Chicago to have 1.354 times the odds of being related to domestic violence, relative to cases that were reported before the COVID-19 pandemic began. 
 
 ```{r odds ratio of predicted terms}
+odds_prelockdown <- exp(0.047)
+odds_prelockdown
 odds_lockdown <- exp(0.303)
 odds_lockdown
 odds_phase2 <- exp(0.111)
@@ -331,16 +333,45 @@ odds_phase3 <- exp(0.309)
 odds_phase3
 odds_phase4 <- exp(0.272)
 odds_phase4
-odds_prelockdown <- exp(0.047)
-odds_prelockdown
 
 ```
 
+```{r confidence intervals for odds ratios}
+#95% CI for odds ratio for pre-lockdown
+cm <- qnorm(0.975)
+se_prelockdown <- 0.020
+lower_pl <- exp(odds_prelockdown - (cm*se_prelockdown))
+upper_pl <- exp(odds_prelockdown + (cm*se_prelockdown))
+lower_pl
+upper_pl
 
-```{r regression analysis pt 2}
-augment(domvio_mod) %>%
-  select(isdomviolence, pandemic_time, .fitted) %>% 
-  mutate(pred_prob = exp(.fitted)/(1 + exp(.fitted)))
+#95% CI for odds ratio for lockdown
+se_lockdown <- 0.024
+lower_l <- exp(odds_lockdown - (cm*se_lockdown))
+upper_l <- exp(odds_lockdown + (cm*se_lockdown))
+lower_l
+upper_l
+
+#95% CI for odds ratio for phase 2
+se_p2 <- 0.025
+lower_p2 <- exp(odds_phase2 - (cm*se_p2))
+upper_p2 <- exp(odds_phase2 + (cm*se_p2))
+lower_p2
+upper_p2
+
+#95% CI for odds ratio for phase 3
+se_p3 <- 0.028
+lower_p3 <- exp(odds_phase3 - (cm*se_p3))
+upper_p3 <- exp(odds_phase3 + (cm*se_p3))
+lower_p3
+upper_p3
+
+#95% CI for odds ratio for phase 4
+se_p4 <- 0.035
+lower_p4 <- exp(odds_phase4 - (cm*se_p4))
+upper_p4 <- exp(odds_phase4 + (cm*se_p4))
+lower_p4
+upper_p4
 
 ```
 
