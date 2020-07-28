@@ -444,7 +444,90 @@ labs(title = "# of domestic violence cases stay relatively
 
 ```
 
+```{r  average daily rate of crime/ domestic violence cases in each of the phases}
+domvio_mut <-domvio_mut %>% 
+  mutate(pandemic_time = case_when(isbeforecovid == 1 ~ "p0 before_covid",
+                                         isprelockdown == 1 ~ "p0 pre-lockdown",
+                                         islockdown == 1 ~ "p1 lockdown",
+                                         isphase2 == 1 ~ "p2 phase 2",
+                                         isphase3 == 1 ~ "p3 phase 3",
+                                         isphase4 == 1 ~ "p4 phase 4"
+                                         ))
 
+
+domvio_phase<-as.data.frame(table(domvio_mut$pandemic_time, domvio_mut$isdomviolence))
+
+domvio_3<-domvio_phase %>%
+  filter (Var2 == 1) %>%
+  pull()
+
+domvio_phase<-domvio_phase %>%
+  mutate (NONDOMVIO = Freq) %>%
+  filter (Var2 == 0) %>%
+  mutate (DOMVIOCASES = domvio_3) %>%
+  select (-Var2, -Freq) %>%
+  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
+  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
+
+domvio_phase <-domvio_phase %>% 
+  mutate(pandemic_phase_days = case_when(Var1 == "p0 before_covid" ~ 231,
+                                         Var1 == "p0 pre-lockdown" ~ 58,
+                                         Var1 == "p1 lockdown" ~ 40,
+                                         Var1 == "p2 phase 2" ~ 33,
+                                         Var1 == "p3 phase 3" ~ 23,
+                                         Var1 == "p4 phase 4" ~ 12
+                                         ))
+
+domvio_phase<-domvio_phase %>% 
+  mutate(PERDAYCRIMECASE = TOTCASES/pandemic_phase_days)
+
+domvio_phase<-domvio_phase %>% 
+  mutate(PERDAYDOMCASE = DOMVIOCASES/pandemic_phase_days)
+
+ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYCRIMECASE)) + geom_boxplot() +
+ labs(title = "crime cases rate appears to be decreasing over the phases",
+       x = "period",
+        y = "average crime cases/day")
+
+ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYDOMCASE)) + geom_boxplot() +
+ labs(title = "dom violence cases rate appears to be increasing over phases",
+       x = "period",
+        y = "domestic violence crime cases/day")
+
+```
+
+```{r crime and domestic violence cases each day over the whole period}
+domvio_2<-domvio %>%
+  mutate(MONTH = substring(DATE..OF.OCCURRENCE, 0, 2)) %>% 
+  mutate(DAY = substring(DATE..OF.OCCURRENCE, 4,5)) %>% 
+  mutate(YEAR = substring(DATE..OF.OCCURRENCE, 7,10)) %>%
+  mutate(YMD = as.integer(paste(YEAR,MONTH,DAY,sep="")))
+
+domvio_perday<-as.data.frame(table(domvio_2$YMD, domvio_mut$isdomviolence))
+
+domvio_1<-domvio_perday %>%
+  filter (Var2 == 1) %>%
+  pull()
+
+domvio_perday<-domvio_perday %>%
+  mutate (NONDOMVIO = Freq) %>%
+  filter (Var2 == 0) %>%
+  mutate (DOMVIOCASES = domvio_1) %>%
+  select (-Var2, -Freq) %>%
+  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
+  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
+
+ggplot(data = domvio_perday, mapping = aes(x = Var1, y = DOMVIOCASES, group=1)) + geom_line()+ geom_point() +
+labs(title = "daily domvio cases over time",
+       x = "Year and Month (YYYYMMDD)",
+       y = "daily cases")
+ggplot(data = domvio_perday, mapping = aes(x = Var1, y = TOTCASES, group=1)) + geom_line()+ geom_point() +
+labs(title = "daily crime cases over time",
+       x = "Year and Month (YYYYMMDD)",
+       y = "daily cases")
+```
+
+```
 ## DISCUSSION
 -summary of what you have learned about your research question along
 -statistical arguments supporting your conclusions
