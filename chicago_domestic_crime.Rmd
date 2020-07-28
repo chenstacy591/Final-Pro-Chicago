@@ -360,6 +360,8 @@ or_phase3 <- exp(0.301)
 or_phase3
 or_phase4 <- exp(0.261)
 or_phase4
+or_9to5 <- exp(-0.314)
+or_9to5
 
 ```
 
@@ -400,7 +402,27 @@ upper_p4 <- exp(0.261 + (cm*se_p4))
 lower_p4
 upper_p4
 
+#95% CI for odds ratio for phase 4
+se_95 <- 0.014
+lower_95 <- exp(-0.314 - (cm*se_95))
+upper_95 <- exp(-0.314 + (cm*se_95))
+lower_95
+upper_95
 ```
+
+We can interpret the odds ratios and 95% CIs in the context of our model and research question as follows:
+
+Adjusting for time of day, we would expect crimes reported prior to the issuing of the first stay at home order in the city of Chicago to have 1.054 times the odds of being related to domestic violence, compared to cases that were reported before the COVID-19 pandemic began, with 95% CI (1.014, 1.097).
+
+Adjusting for time of day, we would expect crimes reported during the "lockdown" phase of the stay at home order in the city of Chicago to have 1.354 times the odds of being related to domestic violence, compared to cases that were reported before the COVID-19 pandemic began, with 95% CI (1.292, 1.419).
+
+Adjusting for time of day, we would expect crimes reported during the phase 2 of reopening (modified stay at home order) in the city of Chicago to have 1.111 times the odds of being related to domestic violence, compared to cases that were reported before the COVID-19 pandemic began, with 95% CI (1.058, 1.166).
+
+Adjusting for time of day, we would expect crimes reported during the phase 3 of reopening (modified stay at home order) in the city of Chicago to have 1.351 times the odds of being related to domestic violence, compared to cases that were reported before the COVID-19 pandemic began, with 95% CI (1.279, 1.427).
+
+Adjusting for time of day, we would expect crimes reported during the phase 4 of reopening (modified stay at home order) in the city of Chicago to have 1.298 times the odds of being related to domestic violence, compared to cases that were reported before the COVID-19 pandemic began, with 95% CI (1.210, 1.393).
+
+Adjusting for lockdown phase, we would expect crimes reported during the 9 to 5 workday in the city of Chicago to have 0.731 times the odds of being related to domestic violence, compared to crimes reported outside this timeframe, with 95% CI (0.711, 0.751).
 
 
 ## DISCUSSION
