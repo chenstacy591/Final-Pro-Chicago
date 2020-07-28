@@ -252,7 +252,7 @@ domvio_mut<-domvio_mut %>%
 -Showcase how 
 -Provide the main results from your analysis
 
-```{r domestic-vs-time}
+```{r domestic prop-vs-time}
 domvio_day<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence))
 
 domvio_1<-domvio_day %>%
@@ -423,6 +423,20 @@ Adjusting for time of day, we would expect crimes reported during the phase 3 of
 Adjusting for time of day, we would expect crimes reported during the phase 4 of reopening (modified stay at home order) in the city of Chicago to have 1.298 times the odds of being related to domestic violence, compared to cases that were reported before the COVID-19 pandemic began, with 95% CI (1.210, 1.393).
 
 Adjusting for lockdown phase, we would expect crimes reported during the 9 to 5 workday in the city of Chicago to have 0.731 times the odds of being related to domestic violence, compared to crimes reported outside this timeframe, with 95% CI (0.711, 0.751).
+
+```{r crim cases-vs-time}
+
+ggplot(data = domvio_day, mapping = aes(x = Var1, y = DOMVIOCASES, group=1)) + geom_line()+ geom_point() +
+labs(title = "Total domestic violence cases appear to be decreasing over the time period",
+       x = "Year and Month (YYYYMM)",
+       y = "total domestic violence cases")
+
+ggplot(data = domvio_day, mapping = aes(x = Var1, y = TOTCASES, group=1)) + geom_line()+ geom_point() +
+labs(title = "Total crime cases appear to be decreasing over the time period",
+       x = "Year and Month (YYYYMM)",
+       y = "total crime  cases")
+
+```
 
 
 ## DISCUSSION
