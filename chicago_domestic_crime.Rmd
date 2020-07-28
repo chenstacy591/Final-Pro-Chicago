@@ -268,9 +268,11 @@ domvio_day<-domvio_day %>%
   mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
 
 ggplot(data = domvio_day, mapping = aes(x = Var1, y = PROPDOMVIO, group=1)) + geom_line()+ geom_point() +
-labs(title = "Monthly domestic violence proportion seem to have shot up in March, when Chicago issued stay-at-home orders",
+labs(title = "Monthly domestic violence proportion shot up in
+March 2020, when Chicago issued the first
+stay-at-home order",
        x = "Year and Month (YYYYMM)",
-       y = "Prop of reported crime that was domestic violence")
+       y = "Prop of crime that was domestic violence")
 
 
 ```
@@ -362,7 +364,6 @@ or_phase4 <- exp(0.261)
 or_phase4
 or_9to5 <- exp(-0.314)
 or_9to5
-
 ```
 
 ```{r confidence intervals for odds ratios}
@@ -426,15 +427,20 @@ Adjusting for lockdown phase, we would expect crimes reported during the 9 to 5 
 
 ```{r crim cases-vs-time}
 
-ggplot(data = domvio_day, mapping = aes(x = Var1, y = DOMVIOCASES, group=1)) + geom_line()+ geom_point() +
-labs(title = "Monthly domestic violence cases appear to be decreasing over the time period",
-       x = "Year and Month (YYYYMM)",
-       y = "total domestic violence cases")
+domvio_day1<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence)) %>%
+  mutate(CRIMETYPE = case_when(Var2 == 1~"Domestic Violence",
+                               Var2 == 0~"Other Crime"))
 
-ggplot(data = domvio_day, mapping = aes(x = Var1, y = TOTCASES, group=1)) + geom_line()+ geom_point() +
-labs(title = "Monthly crime cases appear to be decreasing over the time period",
+ggplot(data = domvio_day1, mapping = aes(x = Var1, y = Freq, group=CRIMETYPE, colour=CRIMETYPE)) + geom_line()+ geom_point() +
+labs(title = "# of domestic violence cases stay relatively
+     constant while other crime cases decreased",
        x = "Year and Month (YYYYMM)",
-       y = "total crime  cases")
+       y = "# cases") + theme(legend.position="bottom")
+
+# ggplot(data = domvio_day, mapping = aes(x = Var1, y = TOTCASES, group=1)) + geom_line()+ geom_point() +
+# labs(title = "Monthly crime cases appear to be decreasing over time",
+#        x = "Year and Month (YYYYMM)",
+#        y = "total crime  cases")
 
 ```
 
