@@ -176,7 +176,7 @@ domvio_mut<-domvio_mut %>%
 ```
 
 ```{r indicator for it being in the 9am-5pm period}
-domvio_mut<-domvio_mut %>%
+domvio_mut <-domvio_mut %>%
   mutate(is9_5 = case_when(
     isPM == 0 & HOUR <= 8 | HOUR == 12 ~0,
     isPM == 0 & HOUR > 8 & HOUR !=12 ~ 1,
@@ -322,8 +322,7 @@ domvio_mut <-domvio_mut %>%
                                          ))
 
 #Create logistic regression model with outcome as domestic violence case yes or no against timeframe relative to the pandemic and lockdown/reopening periods
-domvio_mod <- glm(isdomviolence ~ pandemic_time+as.factor(is9_5), data = domvio_mut, 
-                  family = "binomial")
+domvio_mod <- glm(isdomviolence ~ pandemic_time+as.factor(is9_5), data = domvio_mut, family = "binomial")
 
 #View model output
 tidy(domvio_mod)
@@ -331,29 +330,29 @@ tidy(domvio_mod)
 ```
 Our logistic regression model corresponding to the probability of success that a reported crime for a given time period will be one of domestic violence is as follows: 
 
-$\hat{\beta}_0$ + $\hat{\beta}_1$(pandemic_time == lockdown) + $\hat{\beta}_2$(pandemic_time == phase 2) + $\hat{\beta}_3$(pandemic_time == phase 3) + $\hat{\beta}_4$(pandemic_time == phase 4) + $\hat{\beta}_5$(pandemic_time == pre-lockdown) 
+$\hat{\beta}_0$ + $\hat{\beta}_1$ * (pandemic_time == lockdown) + $\hat{\beta}_2$ * (pandemic_time == phase 2) + $\hat{\beta}_3$ * (pandemic_time == phase 3) + $\hat{\beta}_4$ * (pandemic_time == phase 4) + $\hat{\beta}_5$ * (pandemic_time == pre-lockdown) + $\hat{\beta}_6$ * (is9_5)
 
-At the $\alpha$ = 0.05 significance level, the true $\beta$ coefficients corresponding to the logit of the probability that a case reported during that time period was related to domestic violence for each of our dummy variables (all relative to the baseline/reference category of before the COVID-19 pandemic) were statistically significant. We were specifically interested in $\beta_1$, which corresponds to the logit of the probability of success (that a reported case was related to domestic violence) during lockdown, as compared to before the pandeimc began, and whether there was a relationship between the probability of a reported crime being related to domestic violence during lockdown, when compared to before the pandemic. 
+At the $\alpha$ = 0.05 significance level, the true $\beta$ coefficients corresponding to the logit of the probability that a case reported during that time period was related to domestic violence for each of our dummy variables (all relative to the baseline/reference category of before the COVID-19 pandemic) were statistically significant, as was the beta coefficient corresponding to the logit of the probability of success (see above) during the 9-5 work day, as compared to outside this timeframe. We were specifically interested in $\beta_1$, which corresponds to the logit of the probability of success (that a reported case was related to domestic violence) during lockdown, as compared to before the pandeimc began, and whether there was a relationship between the probability of a reported crime being related to domestic violence during lockdown, when compared to before the pandemic. 
 
-H~0~: $\beta_1$ = 0 (There is no relationship between our predictor and the probability of success that a reported case is related to domestic violence, while holding all other variables constant. The true population parameter $\beta_1$ is equal to 0).  
+H~0~: $\beta_1$ = 0 (There is no relationship between our predictor and the probability of success that a reported case is related to domestic violence, while holding time of day (either during the 9-5 workday or outside this timeframe) constant. The true population parameter $\beta_1$ is equal to 0).  
 
-H~1~: (There is a relationship between our predictor and the probability of success that a reported case is related to domestic violence, while holding all other variables constant. The true population parameter $\beta_1$ is not equal to 0).
+H~1~: (There is a relationship between our predictor and the probability of success that a reported case is related to domestic violence, while holding time of day (either during the 9-5 workday or outside this timeframe) constant. The true population parameter $\beta_1$ is not equal to 0).
 
-Under the null hypothesis, our test statistic follows a standard normal distribution. The value of our test statistic is equal to approximately 12.426, which corresponds to a p-value of less than 0.001. Thus, at the $\alpha$ = 0.05, we reject our null hypothesis; we have sufficient evidence to suggest that the true value of $\beta_1$ is not equal to 0, such that this predictor tells us something about the probability of success of our outcome, while holding all other variables constant.  
+Under the null hypothesis, our test statistic follows a standard normal distribution. The value of our test statistic is equal to approximately 12.426, which corresponds to a p-value of less than 0.001. Thus, at the $\alpha$ = 0.05, we reject our null hypothesis; we have sufficient evidence to suggest that the true value of $\beta_1$ is not equal to 0, such that this predictor tells us something about the probability of success of our outcome, while holding time of day (either during the 9-5 workday or outside this timeframe) constant.
 
-We see from the model output above that the estimated $\hat{\beta}_1$ coefficent, corresponding to the effect of being in the "lockdown" phase of time in quarantine - relative to the time period before COVID-19 - on the probability of success that a reported case will be related to domestic violence, is approximately 0.303. This corresponds to an odds ratio of exp(0.303), which is approximately 1.354. Therefore, we would expect crimes reported during the lockdown phase of the stay-at-home order in the city of Chicago to have 1.354 times the odds of being related to domestic violence, relative to cases that were reported before the COVID-19 pandemic began. 
+We see from the model output above that the estimated $\hat{\beta}_1$ coefficent, corresponding to the difference of being in the "lockdown" phase of time in quarantine - relative to the time period before COVID-19 - on the logit of the probability of success that a reported case will be related to domestic violence, is approximately 0.303. This corresponds to an odds ratio of exp(0.303), which is approximately 1.354. Therefore, we would expect crimes reported during the lockdown phase of the stay-at-home order in the city of Chicago to have 1.354 times the odds of being related to domestic violence, relative to cases that were reported before the COVID-19 pandemic began, while adjusting for time of day, relative to the 9-5 work period. Moreover, we are 95% confident that the true population parameter, exp($\beta_1$) lies within the interval (3.694, 4.059).
 
 ```{r odds ratio of predicted terms}
-odds_prelockdown <- exp(0.047)
-odds_prelockdown
-odds_lockdown <- exp(0.303)
-odds_lockdown
-odds_phase2 <- exp(0.111)
-odds_phase2
-odds_phase3 <- exp(0.309)
-odds_phase3
-odds_phase4 <- exp(0.272)
-odds_phase4
+or_prelockdown <- exp(0.053)
+or_prelockdown
+or_lockdown <- exp(0.303)
+or_lockdown
+or_phase2 <- exp(0.105)
+or_phase2
+or_phase3 <- exp(0.301)
+or_phase3
+or_phase4 <- exp(0.261)
+or_phase4
 
 ```
 
@@ -361,36 +360,36 @@ odds_phase4
 #95% CI for odds ratio for pre-lockdown
 cm <- qnorm(0.975)
 se_prelockdown <- 0.020
-lower_pl <- exp(odds_prelockdown - (cm*se_prelockdown))
-upper_pl <- exp(odds_prelockdown + (cm*se_prelockdown))
+lower_pl <- exp(0.053 - (cm*se_prelockdown))
+upper_pl <- exp(0.053 + (cm*se_prelockdown))
 lower_pl
 upper_pl
 
 #95% CI for odds ratio for lockdown
 se_lockdown <- 0.024
-lower_l <- exp(odds_lockdown - (cm*se_lockdown))
-upper_l <- exp(odds_lockdown + (cm*se_lockdown))
+lower_l <- exp(0.303 - (cm*se_lockdown))
+upper_l <- exp(0.303 + (cm*se_lockdown))
 lower_l
 upper_l
 
 #95% CI for odds ratio for phase 2
 se_p2 <- 0.025
-lower_p2 <- exp(odds_phase2 - (cm*se_p2))
-upper_p2 <- exp(odds_phase2 + (cm*se_p2))
+lower_p2 <- exp(0.105 - (cm*se_p2))
+upper_p2 <- exp(0.105 + (cm*se_p2))
 lower_p2
 upper_p2
 
 #95% CI for odds ratio for phase 3
 se_p3 <- 0.028
-lower_p3 <- exp(odds_phase3 - (cm*se_p3))
-upper_p3 <- exp(odds_phase3 + (cm*se_p3))
+lower_p3 <- exp(0.301 - (cm*se_p3))
+upper_p3 <- exp(0.301 + (cm*se_p3))
 lower_p3
 upper_p3
 
 #95% CI for odds ratio for phase 4
-se_p4 <- 0.035
-lower_p4 <- exp(odds_phase4 - (cm*se_p4))
-upper_p4 <- exp(odds_phase4 + (cm*se_p4))
+se_p4 <- 0.036
+lower_p4 <- exp(0.261 - (cm*se_p4))
+upper_p4 <- exp(0.261 + (cm*se_p4))
 lower_p4
 upper_p4
 
