@@ -470,7 +470,7 @@ domvio_phase<-domvio_phase %>%
   mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
 
 domvio_phase <-domvio_phase %>% 
-  mutate(pandemic_phase_days = case_when(Var1 == "p0 before_covid" ~ 231,
+  mutate(pandemic_phase_days = case_when(Var1 == "p0 before_covid" ~ 198 ,
                                          Var1 == "p0 pre-lockdown" ~ 58,
                                          Var1 == "p1 lockdown" ~ 40,
                                          Var1 == "p2 phase 2" ~ 33,
@@ -485,7 +485,7 @@ domvio_phase<-domvio_phase %>%
   mutate(PERDAYDOMCASE = DOMVIOCASES/pandemic_phase_days)
 
 ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYCRIMECASE)) + geom_boxplot() +
- labs(title = "crime cases rate appears to be decreasing over the phases",
+ labs(title = "crime rates initially decrease, then increase and stabilize",
        x = "period",
         y = "average crime cases/day")
 
