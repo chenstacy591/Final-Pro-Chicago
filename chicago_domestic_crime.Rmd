@@ -427,12 +427,12 @@ Adjusting for lockdown phase, we would expect crimes reported during the 9 to 5 
 ```{r crim cases-vs-time}
 
 ggplot(data = domvio_day, mapping = aes(x = Var1, y = DOMVIOCASES, group=1)) + geom_line()+ geom_point() +
-labs(title = "Total domestic violence cases appear to be decreasing over the time period",
+labs(title = "Monthly domestic violence cases appear to be decreasing over the time period",
        x = "Year and Month (YYYYMM)",
        y = "total domestic violence cases")
 
 ggplot(data = domvio_day, mapping = aes(x = Var1, y = TOTCASES, group=1)) + geom_line()+ geom_point() +
-labs(title = "Total crime cases appear to be decreasing over the time period",
+labs(title = "Monthly crime cases appear to be decreasing over the time period",
        x = "Year and Month (YYYYMM)",
        y = "total crime  cases")
 
