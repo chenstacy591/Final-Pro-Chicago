@@ -315,6 +315,53 @@ ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYDOMCASE)) + geom_b
 
 ```
 
+```{r crime and domestic violence cases each day over the whole period}
+
+domvio<-domvio %>%
+  mutate(MONTH = substring(DATE..OF.OCCURRENCE, 0, 2)) %>% 
+  mutate(DAY = substring(DATE..OF.OCCURRENCE, 4,5)) %>% 
+  mutate(YEAR = substring(DATE..OF.OCCURRENCE, 7,10)) %>%
+  mutate(YMD = as.integer(paste(YEAR,MONTH,DAY,sep="")))
+
+domvio_perday<-as.data.frame(table(domvio$YMD, domvio_mut$isdomviolence))
+
+domvio_1<-domvio_perday %>%
+  filter (Var2 == 1) %>%
+  pull()
+
+domvio_perday<-domvio_perday %>% 
+  mutate(YMD=Var1) %>% 
+  mutate(YMD=as.integer(as.character(YMD))) %>% 
+  mutate(period_indicator = case_when( YMD < 20200124 ~"before_covid",
+                                       YMD >= 20200124 & YMD < 20200322~"before-lockdown",
+                                       YMD >= 20200322 & YMD < 20200501~"lockdown",
+                                       YMD >= 20200501 & YMD < 20200603~"phase 2",
+                                       YMD >= 20200603 & YMD < 20200626~"phase 3",
+                                       YMD >=20200626 ~"phase 4"
+                                       
+  ))
+
+
+domvio_perday<-domvio_perday %>%
+  mutate (NONDOMVIO = Freq) %>%
+  filter (Var2 == 0) %>%
+  mutate (DOMVIOCASES = domvio_1) %>%
+  select (-Var2, -Freq) %>%
+  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
+  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
+
+ggplot(data = domvio_perday, mapping = aes(x = Var1, y = DOMVIOCASES, colour = period_indicator, group=1)) + geom_line()+ geom_point() +
+  labs(title = "daily domvio cases over time shows domestic crime rates over different phases are not constant",
+       x = "Year and Month (YYYYMMDD)",
+       y = "daily cases")
+ggplot(data = domvio_perday, mapping = aes(x = Var1, y = TOTCASES, colour = period_indicator, group=1))+ geom_line() + geom_point() +
+  labs(title = "daily crime cases over time shows crime rates over the different phases aren't constant /n
+       note the increased crimes around the time of George Floyd's death",
+       x = "Year and Month (YYYYMMDD)",
+       y = "daily cases")
+```
+
+
 #### Chi-Square Test
 Since the data (Table 1) satisfies the independent sampling assumption and is large enough (i.e. each cell > 10), we will be performing a chi-square test at the $\alpha$  = 0.05 significance level. We test the two hypotheses below: 
 
