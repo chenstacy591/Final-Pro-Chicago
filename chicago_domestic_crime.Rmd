@@ -382,12 +382,16 @@ or_beforelockdown
 
 or_lockdown <- exp(0.303)
 or_lockdown
+
 or_phase2 <- exp(0.105)
 or_phase2
+
 or_phase3 <- exp(0.301)
 or_phase3
+
 or_phase4 <- exp(0.261)
 or_phase4
+
 or_9to5 <- exp(-0.314)
 or_9to5
 ```
