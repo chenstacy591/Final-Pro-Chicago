@@ -303,14 +303,6 @@ ggplot(data = domvio_perday, mapping = aes(x = Var1, y = TOTCASES, colour = peri
        x = "Year and Month (YYYYMMDD)",
        y = "daily cases") + expand_limits(x = 0, y = 0)
 
-ggplot(data = domvio_perday, mapping = aes(x = Var1, y = PROPDOMVIO, colour = period_indicator, group=1))+ geom_line() + geom_point() +
-  labs(title = "prop crime rates over the different phases aren't constant /n
-       note the increased crimes around the time of George Floyd's death",
-       x = "Year and Month (YYYYMMDD)",
-       y = "daily cases") + expand_limits(x = 0, y = 0)
-
-
-
 ```
 
 
