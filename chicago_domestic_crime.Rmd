@@ -1,20 +1,11 @@
 ---
-title: "Safer at home? Domestic Violence During the COVID-19 Pandemic"
+title: "Safer at Home? Domestic Violence in Chicago During the Pandemic"
 output: pdf_document
 author: Samuel, Natalie, & Stacy
 ---
 
 ## INTRODUCTION AND DATA
-
-Safer at home? Domestic Violence During the COVID-19 Pandemic
-
-In what has been dubbed “a pandemic within a pandemic,” a new public health crisis has emerged in the wake of the coronavirus - increasing rates of domestic violence, affecting those in abusive relationships around the globe. This trend is not necessarily surprising, since rates of domestic violence tend to increase whenever families spend more time together - such as during Christmas and summer vacations - according to Bristol University sociologist Marianne Hester, but still troubling nonetheless, especially in countries (like the United States) where the virus doesn’t seem to be disappearing anytime soon. Without a strong support network due to social distancing and lockdown restrictions, it is much more difficult for victims of domestic violence to get help or escape (quarantined in their home), while the situation also enables the abuser by giving them greater power and control over what their partner can and can not do - suggesting that perhaps not everyone is truly “safer at home.” 
-
-In order to further investigate the rate of domestic violence during COVID-19, we decided to pulled existing data from the City of Chicago Data Portal, which contains data related to reported incidents of crime (with the exception of murders where data exists for each victim) that occurred in the City of Chicago from 2001 to present. The data contained in this dataset were extracted from the Chicago Police Department's CLEAR (Citizen Law Enforcement Analysis and Reporting) system.
-
-
--introduce your general research question and your data (where it came from, how it was collected, what are the cases, what are the variables, etc.).
--Define what we mean by domestic violence
+(BLAH BLAH from doc)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F, message=F, warning=F)
@@ -23,9 +14,7 @@ library(tidyverse)
 ```
 
 ## METHODOLOGY
--variables used to address your research question
--useful visualizations or summary statistics
--introduce and justify the statistical method(s) that you believe will be useful in answering your research question.
+(BLAH BLAH from doc)
 
 ```{r mutate original data to make month day year variables}
 domvio<-domvio %>%
@@ -37,7 +26,6 @@ domvio<-domvio %>%
   mutate(DAY = as.integer(substring(DATE..OF.OCCURRENCE, 4,5))) %>% 
   mutate(YEAR = as.integer(substring(DATE..OF.OCCURRENCE, 7,10)))
   
-
 domvio<-domvio %>% 
   mutate(isPM = case_when(substring(DATE..OF.OCCURRENCE,21,22) == "AM" ~ 0,
                           substring(DATE..OF.OCCURRENCE,21,22) == "PM" ~ 1))
@@ -65,11 +53,11 @@ domvio_mut<-domvio_mut %>%
     ))
 ```
 
-```{r prelockdown-indicator}
+```{r beforelockdown-indicator}
 #create an indicator for being before lockdown (tho covid is in the USA)
-#this indicator is "isprelockdown" 2020/1/25-2020/3/21
+#this indicator is "isbeforelockdown" 2020/1/25-2020/3/21
 domvio_mut<-domvio_mut %>%
-  mutate(isprelockdown = case_when(
+  mutate(isbeforelockdown = case_when(
     YEAR == 2019 ~ 0,
     YEAR == 2020 & MONTH == 1 & DAY <=24 ~ 0,
     YEAR == 2020 & MONTH == 1 & DAY > 24 ~ 1,
@@ -136,11 +124,10 @@ domvio_mut<-domvio_mut %>%
 ```
 
 ```{r domvio-indicator}
-#find which labels have to do with domestic violence
+#find which secondary description labels are domestic violence
 domvio_cat<-domvio_mut %>%
   group_by(SECONDARY.DESCRIPTION) %>%
   summarise(n=n())
-domvio_cat
 
 #create an indicator for cases of dom violence
 #this indicator is "isdomviolence"
@@ -175,30 +162,35 @@ domvio_mut<-domvio_mut %>%
     ))
 ```
 
-```{r indicator for it being in the 9am-5pm period}
+```{r indicator time being in the 9am-5pm period}
 domvio_mut <-domvio_mut %>%
   mutate(is9_5 = case_when(
     isPM == 0 & HOUR <= 8 | HOUR == 12 ~0,
     isPM == 0 & HOUR > 8 & HOUR !=12 ~ 1,
     isPM == 1 & HOUR <6 | HOUR ==12 ~ 1,
     isPM == 1 & HOUR >=6 & HOUR != 12 ~ 0
-    
   ))
+```
 
-glimpse(domvio_mut)
-
+```{r creating PERIOD indicators that shows before covid, during lockdown, and phase 3 together}
+domvio_mut<-domvio_mut %>% 
+  mutate(PERIOD = case_when(isbeforecovid == 1 ~ "pre",
+                                         isbeforelockdown == 1 ~ "pre",
+                                         islockdown == 1 ~ "during",
+                                         isphase2 == 1 ~ "during",
+                                         isphase3 == 1 ~ "post",
+                                         isphase4 == 1 ~ "post"
+                                         ) )
 ```
 
 ```{r cases-per-covidphase}
-#if you are wondering about how the actual data looks like there it is
-
-#number of observations during in 2020 pre covid=140697
+#number of observations during in 2020 before covid=140697
 domvio_mut %>% 
   count (isbeforecovid)
 
-#number of observations during prelockdown=34619
+#number of observations during beforelockdown=34619
 domvio_mut %>% 
-  count (isprelockdown)
+  count (isbeforelockdown)
 
 #number of observations during lockdown=16842
 domvio_mut %>% 
@@ -236,60 +228,106 @@ domvio_mut %>%
   count(isdomviolence)
 ```
 
-
-```{r creating chisquare_indicators that shows before covid, during lockdown, and phase 3 together}
-domvio_mut<-domvio_mut %>% 
-  mutate(chisquare_indicators= case_when(isbeforecovid == 1 ~ "pre",
-                                         isprelockdown == 1 ~ "pre",
-                                         islockdown == 1 ~ "lockdown",
-                                         isphase2 == 1 ~ "lockdown",
-                                         isphase3 == 1 ~ "post",
-                                         isphase4 == 1 ~ "post"
-                                         ) )
-```
-
 ## RESULTS
--Showcase how 
--Provide the main results from your analysis
+(BLAH BLAH from Doc)
 
 ```{r domestic prop-vs-time}
-domvio_day<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence))
+#create plot for prop of domvio cases vs. time in months
 
-domvio_1<-domvio_day %>%
+domvio_month<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence))
+
+domvio_vector<-domvio_month %>%
   filter (Var2 == 1) %>%
   pull()
 
-domvio_day<-domvio_day %>%
+domvio_month<-domvio_month %>%
   mutate (NONDOMVIO = Freq) %>%
   filter (Var2 == 0) %>%
-  mutate (DOMVIOCASES = domvio_1) %>%
+  mutate (DOMVIOCASES = domvio_vector) %>%
   select (-Var2, -Freq) %>%
   mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
   mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
 
-ggplot(data = domvio_day, mapping = aes(x = Var1, y = PROPDOMVIO, group=1)) + geom_line()+ geom_point() +
+ggplot(data = domvio_month, mapping = aes(x = Var1, y = PROPDOMVIO, group=1)) + geom_line()+ geom_point() +
 labs(title = "Monthly domestic violence proportion shot up in
-March 2020, when Chicago issued the first
+March 2020, when Chicago first issued 
 stay-at-home order",
        x = "Year and Month (YYYYMM)",
        y = "Prop of crime that was domestic violence")
+```
 
+```{r crim cases-vs-time}
+
+domvio_day1<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence)) %>%
+  mutate(CRIMETYPE = case_when(Var2 == 1~"Domestic Violence",
+                               Var2 == 0~"Other Crime"))
+
+ggplot(data = domvio_day1, mapping = aes(x = Var1, y = Freq, group=CRIMETYPE, colour=CRIMETYPE)) + geom_line()+ geom_point() +
+labs(title = "# of domestic violence cases stay relatively
+     constant while other crime cases decreased",
+       x = "Year and Month (YYYYMM)",
+       y = "# cases") + theme(legend.position="bottom")
+```
+
+```{r  average daily rate of crime/ domestic violence cases in each of the phases}
+domvio_mut <-domvio_mut %>% 
+  mutate(PHASE = case_when(isbeforecovid == 1 ~ "before_covid",
+                                         isbeforelockdown == 1 ~ "before-lockdown",
+                                         islockdown == 1 ~ "lockdown",
+                                         isphase2 == 1 ~ "phase 2",
+                                         isphase3 == 1 ~ "phase 3",
+                                         isphase4 == 1 ~ "phase 4"
+                                         ))
+
+domvio_phase<-as.data.frame(table(domvio_mut$PHASE, domvio_mut$isdomviolence))
+
+domvio_3<-domvio_phase %>%
+  filter (Var2 == 1) %>%
+  pull()
+
+domvio_phase<-domvio_phase %>%
+  mutate (NONDOMVIO = Freq) %>%
+  filter (Var2 == 0) %>%
+  mutate (DOMVIOCASES = domvio_3) %>%
+  select (-Var2, -Freq) %>%
+  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
+  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
+
+domvio_phase <-domvio_phase %>% 
+  mutate(pandemic_phase_days = case_when(Var1 == "before_covid" ~ 198 ,
+                                         Var1 == "before-lockdown" ~ 58,
+                                         Var1 == "lockdown" ~ 40,
+                                         Var1 == "phase 2" ~ 33,
+                                         Var1 == "phase 3" ~ 23,
+                                         Var1 == "phase 4" ~ 12
+                                         ))
+
+domvio_phase<-domvio_phase %>% 
+  mutate(PERDAYCRIMECASE = TOTCASES/pandemic_phase_days)
+
+domvio_phase<-domvio_phase %>% 
+  mutate(PERDAYDOMCASE = DOMVIOCASES/pandemic_phase_days)
+
+ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYDOMCASE)) + geom_boxplot() +
+ labs(title = "dom violence cases rate appears to increase over phases",
+       x = "phase",
+        y = "avg domestic violence cases/day") + expand_limits(x = 0, y = 0)
 
 ```
 
 #### Chi-Square Test
-
-```{r chisquared test}
-table(domvio_mut$isdomviolence, domvio_mut$chisquare_indicators)
-chisq.test(table(domvio_mut$isdomviolence, domvio_mut$chisquare_indicators))
-```
-
 Since the data (Table 1) satisfies the independent sampling assumption and is large enough (i.e. each cell > 10), we will be performing a chi-square test at the $\alpha$  = 0.05 significance level. We test the two hypotheses below: 
 
-H~0 : The frequency of domestic violence cases in Chicago is unrelated to the phases of the pandemic.
-H~1 : The frequency of domestic violence cases in Chicago is related to the phases of the pandemic.
+H~0 : Domestic violence cases in Chicago is unrelated to the 3 periods of the pandemic.
+H~1 : Domestic violence cases in Chicago is related to the 3 periods of the pandemic.
 
-Under the null hypothesis, our test statistic has a chi-square distribution with 2 degrees of freedom. We performed the test and obtained a chi-square value of 247.63, which corresponds to a p-value of < 0.001. Thus, at an $\alpha$ = 0.05 significance level, we reject the null hypothesis; there is sufficient evidence to suggest that the frequency of domestic violence cases in Chicago is related to the phases of the pandemic.
+*The 6 phases of the pandemic is divided into 3 periods: before-lockdown (before COVID and before lockdown), during lockdown (lockdown and phase 2), and post-lockdown (phases 3 and 4)
+```{r chisquared test}
+table(domvio_mut$isdomviolence, domvio_mut$PHASE)
+chisq.test(table(domvio_mut$isdomviolence, domvio_mut$PHASE))
+```
+
+Under the null hypothesis, our test statistic has a chi-square distribution with 2 degrees of freedom. We performed the test and obtained a chi-square value of 247.63, which corresponds to a p-value of < 0.001. Thus, at an $\alpha$ = 0.05 significance level, we reject the null hypothesis; there is sufficient evidence to suggest that domestic violence cases in Chicago is related to the 3 periods of the pandemic.
 
 #### Step Down 2 Proportion Z-Tests
 
@@ -304,42 +342,25 @@ prop.test(x=c(2667, 17919),n=c(2667+17599, 17919+157397), alternative="two.sided
 
 #lockdown-vs-pre
 prop.test(x=c(4311,17919),n=c(35420, 17919+157397), alternative="two.sided", conf.level=.95)
-
-.05/3
 ```
-We found that all three pairwise difference in proportions are significant at the adjusted significance level.
+We found that all three pairwise difference in proportions are significant at the adjusted $\alpha$ = 0.05/3 significance level. There is sufficient evidence to suggest that the proportion of crime in Chicago related to domestic violence is different for each period of the pandemic.
 
 #### Regression Analysis
-
-In order to model the relationship between the probability that a given case reported to the police was an incidence of domestic violence (considered to be a “success” in the context of our analysis), and the phase of the pandemic in which it was reported, we created a logistic regression model. We chose to use a logistic regression model because we had a binary “success”  outcome, where the variable “isdomvio” was either a 0 or 1, with 1 being classified as a case of domestic violence, and 0 otherwise - a scenario in which it is inappropriate to use multiple linear regression, due to the challenges of modeling probabilities with this method. In our model, we included a series of dummy variables under the category “pandemic_time” in reference to the specific phase of lockdown that the crime was reported in - either before the COVID-19 pandemic (before_covid), prior to when the first official stay at home order was issued (pre-lockdown), during the strict stay at home order itself (lockdown), or during either phase 2, phase 3, or phase 4 of reopening (phase 2, phase 3, and phase 4, respectively). The exact dates we used to define each of these time periods are provided in the introduction, for reference. The variable, “before_covid” was used as the baseline category for the series of pandemic_time dummy variable, to which the difference of the effect of a given estimated parameter on the predicted outcome of success was given in reference to. In our model, we also adjusted for the time of day in which the crime was reported to the police, using a binary indicator “is9_5” where a 1 indicates that the crime was reported during the 9-5 workday, 0 otherwise. We chose to include this predictor in our model and adjust for its effect with the effect of the COVID-19 pandemic on the workforce and normal working hours in mind. We hypothesized that before the pandemic, one would be more likely to see crimes of domestic violence reported to the police outside of the 9 to 5 working day, given that individuals would most likely be at work, less at risk of being subjected to violent encounters with an abusive partner, rather than at home (outside of the 9 to 5 time-frame). However, during the pandemic, as more individuals were forced to work from home and the concept of a traditional “9 to 5” work day disappeared for most, we hypothesized that we would see a difference in the number of cases of domestic violence reported during these two time periods, and more specifically, that we would see more cases reported during lockdown during the 9 to 5 workday than before.   
-
-Adjusting for time, we hypothesized that the probability of success that a case reported to the police would be related to domestic violence would increase during the initial lockdown phase, and begin to recede slightly as the state of Chicago and the city of Illinois began to gradually reopen. We based this hypothesis on our understanding of the nature of domestic violence (i.e. that it often occurs more often in the home, as the time individuals spend with abusive partners increases), and using evidence from the spike in the proportion of cases of domestic violence as the stay at home order went into effect that we previously confirmed graphically. 
-
-After running our code, we also determined the estimated odds ratio for each beta coefficient(given by exp($\beta$) in our model and calculated the associated confidence interval for each of these odds ratios (with the appropriate confidence multiplier using a standard normal distribution and the standard error from our model output) for use in further analysis. In this context, exp($\beta$) corresponds to the multiplicative effect of a 1 unit change (i.e. whether a dummy condition is satisfied or not) in a given predictor on the odds of a crime reported to the police being related to domestic violence, while holding all other confounders constant. Additionally, when we report confidence intervals and say we are 95% confident, what we mean is that if we were to take new samples independently from the original population and repeatedly construct logistic regression models and confidence intervals for exp($\beta$) in the same way, we would expect 95% of such intervals to cover the true parameter.
-
+(BLAH BLAH copy from doc)
 
 ```{r logistic-var}
 #Creating new dummy variables to use as indicators
 library(broom)
-domvio_mut <-domvio_mut %>% 
-  mutate(pandemic_time = case_when(isbeforecovid == 1 ~ "before_covid",
-                                         isprelockdown == 1 ~ "pre-lockdown",
-                                         islockdown == 1 ~ "lockdown",
-                                         isphase2 == 1 ~ "phase 2",
-                                         isphase3 == 1 ~ "phase 3",
-                                         isphase4 == 1 ~ "phase 4"
-                                         ))
 
-#Create logistic regression model with outcome as domestic violence case yes or no against timeframe relative to the pandemic and lockdown/reopening periods
-domvio_mod <- glm(isdomviolence ~ pandemic_time+as.factor(is9_5), data = domvio_mut, family = "binomial")
+#Create logistic regression model with outcome as domestic violence case yes or no against time frame relative to the pandemic phases
+domvio_mod <- glm(isdomviolence ~ PHASE + as.factor(is9_5), data = domvio_mut, family = "binomial")
 
 #View model output
 tidy(domvio_mod)
-
 ```
 Our logistic regression model corresponding to the probability of success that a reported crime for a given time period will be one of domestic violence is as follows: 
 
-$\hat{\beta}_0$ + $\hat{\beta}_1$ * (pandemic_time == lockdown) + $\hat{\beta}_2$ * (pandemic_time == phase 2) + $\hat{\beta}_3$ * (pandemic_time == phase 3) + $\hat{\beta}_4$ * (pandemic_time == phase 4) + $\hat{\beta}_5$ * (pandemic_time == pre-lockdown) + $\hat{\beta}_6$ * (is9_5)
+$\hat{\beta}_0$ + $\hat{\beta}_1$ * (PHASE == lockdown) + $\hat{\beta}_2$ * (PHASE == phase 2) + $\hat{\beta}_3$ * (PHASE == phase 3) + $\hat{\beta}_4$ * (PHASE == phase 4) + $\hat{\beta}_5$ * (PHASE == before-lockdown) + $\hat{\beta}_6$ * (is9_5)
 
 At the $\alpha$ = 0.05 significance level, the true $\beta$ coefficients corresponding to the logit of the probability that a case reported during that time period was related to domestic violence for each of our dummy variables (all relative to the baseline/reference category of before the COVID-19 pandemic) were statistically significant, as was the beta coefficient corresponding to the logit of the probability of success (see above) during the 9-5 work day, as compared to outside this timeframe. We were specifically interested in $\beta_1$, which corresponds to the logit of the probability of success (that a reported case was related to domestic violence) during lockdown, as compared to before the pandeimc began, and whether there was a relationship between the probability of a reported crime being related to domestic violence during lockdown, when compared to before the pandemic. 
 
@@ -352,8 +373,8 @@ Under the null hypothesis, our test statistic follows a standard normal distribu
 We see from the model output above that the estimated $\hat{\beta}_1$ coefficent, corresponding to the difference of being in the "lockdown" phase of time in quarantine - relative to the time period before COVID-19 - on the logit of the probability of success that a reported case will be related to domestic violence, is approximately 0.303. This corresponds to an odds ratio of exp(0.303), which is approximately 1.354. Therefore, we would expect crimes reported during the lockdown phase of the stay-at-home order in the city of Chicago to have 1.354 times the odds of being related to domestic violence, relative to cases that were reported before the COVID-19 pandemic began, while adjusting for time of day, relative to the 9-5 work period. Moreover, we are 95% confident that the true population parameter, exp($\beta_1$) lies within the interval (3.694, 4.059).
 
 ```{r odds ratio of predicted terms}
-or_prelockdown <- exp(0.053)
-or_prelockdown
+or_beforelockdown <- exp(0.053)
+or_beforelockdown
 or_lockdown <- exp(0.303)
 or_lockdown
 or_phase2 <- exp(0.105)
@@ -367,11 +388,11 @@ or_9to5
 ```
 
 ```{r confidence intervals for odds ratios}
-#95% CI for odds ratio for pre-lockdown
+#95% CI for odds ratio for before-lockdown
 cm <- qnorm(0.975)
-se_prelockdown <- 0.020
-lower_pl <- exp(0.053 - (cm*se_prelockdown))
-upper_pl <- exp(0.053 + (cm*se_prelockdown))
+se_beforelockdown <- 0.020
+lower_pl <- exp(0.053 - (cm*se_beforelockdown))
+upper_pl <- exp(0.053 + (cm*se_beforelockdown))
 lower_pl
 upper_pl
 
@@ -425,115 +446,6 @@ Adjusting for time of day, we would expect crimes reported during the phase 4 of
 
 Adjusting for lockdown phase, we would expect crimes reported during the 9 to 5 workday in the city of Chicago to have 0.731 times the odds of being related to domestic violence, compared to crimes reported outside this timeframe, with 95% CI (0.711, 0.751).
 
-```{r crim cases-vs-time}
 
-domvio_day1<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence)) %>%
-  mutate(CRIMETYPE = case_when(Var2 == 1~"Domestic Violence",
-                               Var2 == 0~"Other Crime"))
-
-ggplot(data = domvio_day1, mapping = aes(x = Var1, y = Freq, group=CRIMETYPE, colour=CRIMETYPE)) + geom_line()+ geom_point() +
-labs(title = "# of domestic violence cases stay relatively
-     constant while other crime cases decreased",
-       x = "Year and Month (YYYYMM)",
-       y = "# cases") + theme(legend.position="bottom")
-
-# ggplot(data = domvio_day, mapping = aes(x = Var1, y = TOTCASES, group=1)) + geom_line()+ geom_point() +
-# labs(title = "Monthly crime cases appear to be decreasing over time",
-#        x = "Year and Month (YYYYMM)",
-#        y = "total crime  cases")
-
-```
-
-```{r  average daily rate of crime/ domestic violence cases in each of the phases}
-domvio_mut <-domvio_mut %>% 
-  mutate(pandemic_time = case_when(isbeforecovid == 1 ~ "p0 before_covid",
-                                         isprelockdown == 1 ~ "p0 pre-lockdown",
-                                         islockdown == 1 ~ "p1 lockdown",
-                                         isphase2 == 1 ~ "p2 phase 2",
-                                         isphase3 == 1 ~ "p3 phase 3",
-                                         isphase4 == 1 ~ "p4 phase 4"
-                                         ))
-
-
-domvio_phase<-as.data.frame(table(domvio_mut$pandemic_time, domvio_mut$isdomviolence))
-
-domvio_3<-domvio_phase %>%
-  filter (Var2 == 1) %>%
-  pull()
-
-domvio_phase<-domvio_phase %>%
-  mutate (NONDOMVIO = Freq) %>%
-  filter (Var2 == 0) %>%
-  mutate (DOMVIOCASES = domvio_3) %>%
-  select (-Var2, -Freq) %>%
-  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
-  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
-
-domvio_phase <-domvio_phase %>% 
-  mutate(pandemic_phase_days = case_when(Var1 == "p0 before_covid" ~ 198 ,
-                                         Var1 == "p0 pre-lockdown" ~ 58,
-                                         Var1 == "p1 lockdown" ~ 40,
-                                         Var1 == "p2 phase 2" ~ 33,
-                                         Var1 == "p3 phase 3" ~ 23,
-                                         Var1 == "p4 phase 4" ~ 12
-                                         ))
-
-domvio_phase<-domvio_phase %>% 
-  mutate(PERDAYCRIMECASE = TOTCASES/pandemic_phase_days)
-
-domvio_phase<-domvio_phase %>% 
-  mutate(PERDAYDOMCASE = DOMVIOCASES/pandemic_phase_days)
-
-ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYCRIMECASE)) + geom_boxplot() +
- labs(title = "crime rates initially decrease, then increase and stabilize",
-       x = "period",
-        y = "average crime cases/day")
-
-ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYDOMCASE)) + geom_boxplot() +
- labs(title = "dom violence cases rate appears to be increasing over phases",
-       x = "period",
-        y = "domestic violence crime cases/day")
-
-```
-
-```{r crime and domestic violence cases each day over the whole period}
-domvio_2<-domvio %>%
-  mutate(MONTH = substring(DATE..OF.OCCURRENCE, 0, 2)) %>% 
-  mutate(DAY = substring(DATE..OF.OCCURRENCE, 4,5)) %>% 
-  mutate(YEAR = substring(DATE..OF.OCCURRENCE, 7,10)) %>%
-  mutate(YMD = as.integer(paste(YEAR,MONTH,DAY,sep="")))
-
-domvio_perday<-as.data.frame(table(domvio_2$YMD, domvio_mut$isdomviolence))
-
-domvio_1<-domvio_perday %>%
-  filter (Var2 == 1) %>%
-  pull()
-
-domvio_perday<-domvio_perday %>%
-  mutate (NONDOMVIO = Freq) %>%
-  filter (Var2 == 0) %>%
-  mutate (DOMVIOCASES = domvio_1) %>%
-  select (-Var2, -Freq) %>%
-  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
-  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
-
-ggplot(data = domvio_perday, mapping = aes(x = Var1, y = DOMVIOCASES, group=1)) + geom_line()+ geom_point() +
-labs(title = "daily domvio cases over time",
-       x = "Year and Month (YYYYMMDD)",
-       y = "daily cases")
-ggplot(data = domvio_perday, mapping = aes(x = Var1, y = TOTCASES, group=1)) + geom_line()+ geom_point() +
-labs(title = "daily crime cases over time",
-       x = "Year and Month (YYYYMMDD)",
-       y = "daily cases")
-```
-
-```
 ## DISCUSSION
--summary of what you have learned about your research question along
--statistical arguments supporting your conclusions
--critique your own methods and provide suggestions for improving your analysis (Issues pertaining to the reliability and validity of your data and appropriateness of the statistical analysis)
-Make sure to mention possible confounders we did not include in our model, perhaps also the fact that we were just looking at Chicago, vs. the US as a whole or even multiple countries.
--what you would do differently
--what you would do next if you were going to continue work on the project
-
-Moving forward, it would be interesting to compare the rates of domestic violence reported throughout lockdown in Chicago to other U.S. cities, and perhaps even other countries. We would be interested in whether there is perhaps a difference in the proportion of domestic violence cases in more rural or suburban areas, while adjusting for demographic factors, when compared to urban/metropolitan cities like Chicago, or if rates of domestic violence are affected by geographic region. Furthermore, given the way the US has handled the pandemic thus far, and how we have fared compared to the rest of the world when it comes to reopening, it might also be interesting to see if we see a more marked decline in domestic violence cases in other countries that have had greater success returning to some sense of “normal” life after strict lockdown. Though the number of cases seemed to be trending slightly downwards (with the exception of phase 3) once reopening began, relative to the initial spike during strict lockdown, we did not see a very large difference, and hypothesize that this could be due in part to the fact that there have been many challenges with reopening the country - so much so that many states have even had to shut down once again as the number of cases continue to rise. With this in mind, we might expect to see a more prominent downward trend in the proportion of reported crimes related to domestic violence in countries where citizens have truly been able to successfully re-open schools and other businesses. 
+(BLAH BLAH from doc)
