@@ -183,49 +183,49 @@ domvio_mut<-domvio_mut %>%
                                          ) )
 ```
 
-```{r cases-per-covidphase}
-#number of observations during in 2020 before covid=140697
-domvio_mut %>% 
-  count (isbeforecovid)
-
-#number of observations during beforelockdown=34619
-domvio_mut %>% 
-  count (isbeforelockdown)
-
-#number of observations during lockdown=16842
-domvio_mut %>% 
-  count (islockdown)
-
-#number of observations during p2=18578
-domvio_mut %>% 
-  count (isphase2)
-
-#number of observations during p3=12722
-domvio_mut %>% 
-  count (isphase3)
-
-#number of observations during p4=7544
-domvio_mut %>% 
-  count(isphase4)
-
-#number of cases of domestic violence=24897
-domvio_mut %>% 
-  count(isdomviolence)
+```{r just to see cases-per-covidphase}
+# #number of observations during in 2020 before covid=140697
+# domvio_mut %>% 
+#   count (isbeforecovid)
+# 
+# #number of observations during beforelockdown=34619
+# domvio_mut %>% 
+#   count (isbeforelockdown)
+# 
+# #number of observations during lockdown=16842
+# domvio_mut %>% 
+#   count (islockdown)
+# 
+# #number of observations during p2=18578
+# domvio_mut %>% 
+#   count (isphase2)
+# 
+# #number of observations during p3=12722
+# domvio_mut %>% 
+#   count (isphase3)
+# 
+# #number of observations during p4=7544
+# domvio_mut %>% 
+#   count(isphase4)
+# 
+# #number of cases of domestic violence=24897
+# domvio_mut %>% 
+#   count(isdomviolence)
 ```
 
-``` {r cases-per-day-or-month}
-#see number of cases of domestic violence on a given day
-domvio_mut %>% 
-  filter(YEAR==2019) %>% 
-  filter(MONTH==7) %>% 
-  filter(DAY==9) %>% 
-  count(isdomviolence)
+``` {r just to see cases-per-day-or-month}
+# #see number of cases of domestic violence on a given day
+# domvio_mut %>% 
+#   filter(YEAR==2019) %>% 
+#   filter(MONTH==7) %>% 
+#   filter(DAY==9) %>% 
+#   count(isdomviolence)
 
-#observations of domestic violence in a given month
-domvio_mut %>% 
-  filter(YEAR==2019) %>% 
-  filter(MONTH==07) %>%
-  count(isdomviolence)
+# #observations of domestic violence in a given month
+# domvio_mut %>% 
+#   filter(YEAR==2019) %>% 
+#   filter(MONTH==07) %>%
+#   count(isdomviolence)
 ```
 
 ## RESULTS
@@ -256,64 +256,7 @@ stay-at-home order",
        y = "Prop of crime that was domestic violence")
 ```
 
-```{r crim cases-vs-time}
 
-domvio_day1<-as.data.frame(table(domvio_mut$DATEINT, domvio_mut$isdomviolence)) %>%
-  mutate(CRIMETYPE = case_when(Var2 == 1~"Domestic Violence",
-                               Var2 == 0~"Other Crime"))
-
-ggplot(data = domvio_day1, mapping = aes(x = Var1, y = Freq, group=CRIMETYPE, colour=CRIMETYPE)) + geom_line()+ geom_point() +
-labs(title = "# of domestic violence cases stay relatively
-     constant while other crime cases decreased",
-       x = "Year and Month (YYYYMM)",
-       y = "# cases") + theme(legend.position="bottom")
-```
-
-```{r  average daily rate of crime/ domestic violence cases in each of the phases}
-domvio_mut <-domvio_mut %>% 
-  mutate(PHASE = case_when(isbeforecovid == 1 ~ "before_covid",
-                                         isbeforelockdown == 1 ~ "before-lockdown",
-                                         islockdown == 1 ~ "lockdown",
-                                         isphase2 == 1 ~ "phase 2",
-                                         isphase3 == 1 ~ "phase 3",
-                                         isphase4 == 1 ~ "phase 4"
-                                         ))
-
-domvio_phase<-as.data.frame(table(domvio_mut$PHASE, domvio_mut$isdomviolence))
-
-domvio_3<-domvio_phase %>%
-  filter (Var2 == 1) %>%
-  pull()
-
-domvio_phase<-domvio_phase %>%
-  mutate (NONDOMVIO = Freq) %>%
-  filter (Var2 == 0) %>%
-  mutate (DOMVIOCASES = domvio_3) %>%
-  select (-Var2, -Freq) %>%
-  mutate (TOTCASES = DOMVIOCASES+NONDOMVIO) %>%
-  mutate (PROPDOMVIO = DOMVIOCASES/TOTCASES)
-
-domvio_phase <-domvio_phase %>% 
-  mutate(pandemic_phase_days = case_when(Var1 == "before_covid" ~ 198 ,
-                                         Var1 == "before-lockdown" ~ 58,
-                                         Var1 == "lockdown" ~ 40,
-                                         Var1 == "phase 2" ~ 33,
-                                         Var1 == "phase 3" ~ 23,
-                                         Var1 == "phase 4" ~ 12
-                                         ))
-
-domvio_phase<-domvio_phase %>% 
-  mutate(PERDAYCRIMECASE = TOTCASES/pandemic_phase_days)
-
-domvio_phase<-domvio_phase %>% 
-  mutate(PERDAYDOMCASE = DOMVIOCASES/pandemic_phase_days)
-
-ggplot(data = domvio_phase, mapping = aes(x = Var1, y = PERDAYDOMCASE)) + geom_boxplot() +
- labs(title = "dom violence cases rate appears to increase over phases",
-       x = "phase",
-        y = "avg domestic violence cases/day") + expand_limits(x = 0, y = 0)
-
-```
 
 ```{r crime and domestic violence cases each day over the whole period}
 
@@ -353,12 +296,21 @@ domvio_perday<-domvio_perday %>%
 ggplot(data = domvio_perday, mapping = aes(x = Var1, y = DOMVIOCASES, colour = period_indicator, group=1)) + geom_line()+ geom_point() +
   labs(title = "daily domvio cases over time shows domestic crime rates over different phases are not constant",
        x = "Year and Month (YYYYMMDD)",
-       y = "daily cases")
+       y = "daily cases") + expand_limits(x = 0, y = 0)
 ggplot(data = domvio_perday, mapping = aes(x = Var1, y = TOTCASES, colour = period_indicator, group=1))+ geom_line() + geom_point() +
   labs(title = "daily crime cases over time shows crime rates over the different phases aren't constant /n
        note the increased crimes around the time of George Floyd's death",
        x = "Year and Month (YYYYMMDD)",
-       y = "daily cases")
+       y = "daily cases") + expand_limits(x = 0, y = 0)
+
+ggplot(data = domvio_perday, mapping = aes(x = Var1, y = PROPDOMVIO, colour = period_indicator, group=1))+ geom_line() + geom_point() +
+  labs(title = "prop crime rates over the different phases aren't constant /n
+       note the increased crimes around the time of George Floyd's death",
+       x = "Year and Month (YYYYMMDD)",
+       y = "daily cases") + expand_limits(x = 0, y = 0)
+
+
+
 ```
 
 
@@ -370,6 +322,15 @@ H~1 : Domestic violence cases in Chicago is related to the 3 periods of the pand
 
 *The 6 phases of the pandemic is divided into 3 periods: before-lockdown (before COVID and before lockdown), during lockdown (lockdown and phase 2), and post-lockdown (phases 3 and 4)
 ```{r chisquared test}
+domvio_mut <-domvio_mut %>% 
+  mutate(PHASE = case_when(isbeforecovid == 1 ~ "before",
+                           isbeforelockdown == 1 ~ "before",
+                           islockdown == 1 ~ "lockdown",
+                           isphase2 == 1 ~ "lockdown",
+                           isphase3 == 1 ~ "recovery",
+                           isphase4 == 1 ~ "recovery"
+  ))
+
 table(domvio_mut$isdomviolence, domvio_mut$PHASE)
 chisq.test(table(domvio_mut$isdomviolence, domvio_mut$PHASE))
 ```
@@ -397,6 +358,15 @@ We found that all three pairwise difference in proportions are significant at th
 
 ```{r logistic-var}
 #Creating new dummy variables to use as indicators
+domvio_mut <-domvio_mut %>% 
+  mutate(PHASE = case_when(isbeforecovid == 1 ~ "before_covid",
+                           isbeforelockdown == 1 ~ "before-lockdown",
+                           islockdown == 1 ~ "lockdown",
+                           isphase2 == 1 ~ "phase 2",
+                           isphase3 == 1 ~ "phase 3",
+                           isphase4 == 1 ~ "phase 4"
+  ))
+
 library(broom)
 
 #Create logistic regression model with outcome as domestic violence case yes or no against time frame relative to the pandemic phases
