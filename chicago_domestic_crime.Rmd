@@ -6,7 +6,21 @@ author: Samuel, Natalie, & Stacy
 
 ## INTRODUCTION AND DATA
 &nbsp;
-(BLAH BLAH from doc)
+In what has been dubbed “a pandemic within a pandemic,” a new public health crisis has emerged in the wake of the coronavirus - increasing rates of domestic violence [1]. Still, this global trend is not necessarily surprising, given that rates of domestic violence tend to increase whenever families spend more time together - such as during Christmas and summer vacations - according to Bristol University sociologist Marianne Hester [1]. Without access to a strong support network in the face of social distancing and lockdown restrictions, victims of domestic violence have a harder time getting help or escaping from their abusive partners - suggesting that perhaps not everyone is truly “safer at home.” In countries like the United States, where the virus doesn’t seem to be disappearing anytime soon, experts have predicted a pronounced and sustained spike in domestic violence cases. 
+
+In our investigation analyzing rates of domestic violence during the COVID-19 pandemic, we pulled existing data from the Chicago Police Department's CLEAR (Citizen Law Enforcement Analysis and Reporting) system, which contains all reported incidents of crime (231,002 observations) that occurred in the city of Chicago from July 10, 2019 to July 8, 2020 [2]. 
+
+Through our analyses, we hope to investigate if and how the different phases of lockdown affected the proportion of crimes that were reported as domestic violence in the City of Chicago. Since the majority of domestic violence cases go unreported and thus cannot be surveyed, we will use these reported cases as a proxy to estimate the true proportion of crimes that were related to domestic violence in Chicago as the pandemic progressed [3]. Furthermore, combining timelines of domestic violence cases and lockdown regulations in the city of Chicago will also provide a comprehensive account of how the two relate to each other. The following key timestamps were used to stratify our data into 6 phases for the purposes of this study:
+
+1. BEFORE COVID-19 (July 10, 2019 - earliest date recorded in the dataset)
+2. BEFORE-LOCKDOWN (January 24, 2020 - The first confirmed case in Illinois (a Chicago resident) is reported [4]).
+3. LOCKDOWN (March 22, 2020 - First full day of strict stay at home order for all individuals except those considered essential workers [5]).
+4. PHASE 2 (May 1, 2020 - Chicago enters phase 2 of its gradual reopening plan, under a modified stay at home order that allows some non-essential businesses to reopen for curb-side pickup and delivery, in addition to allowing residents to resume some outdoor activities while practicing social distancing [6]).
+5. PHASE 3 (June 3, 2020 - Chicago enters phase 3 of its gradual reopening plan, which allows for gatherings of up to 10 and reopened offices, retail stores, bars, barbershops, and churches, all with safety precautions [5]).
+6. PHASE 4 (June 26, 2020 - Chicago enters phase 4 of its gradual reopening plan, which reopens schools, restaurant outdoor seating, and fitness clubs with safety precautions in place [7]).
+
+Based on our background research, we hypothesize that there will be a spike in domestic violence cases at the beginning of lockdown, as more individuals are forced to quarantine at home with an abusive partner. Similarly, as states begin to open up, we would expect the proportion of crimes related to domestic violence to decrease back to “normal” levels in accordance with relaxation of lockdown orders. Evaluating the proportion of cases that were related to domestic violence out of all crimes committed, as opposed to the pure number of domestic violence cases alone is important for identifying areas of focus for police-training and law enforcement initiatives that may ultimately improve public policy. We will analyze the validity of our hypotheses using a variety of statistical methods, including a Chi-square test, any necessary step-down tests to identify pairwise differences, and a logistic regression model.
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F, message=F, warning=F)
@@ -230,6 +244,7 @@ domvio_mut<-domvio_mut %>%
 
 #### Visualizations
 &nbsp;
+
 To visualize the fluctuations in domestic violence cases during the time period of interest, we first plotted the daily number of cases of all crimes and those reported as domestic violence in the past year. We also plotted the proportion of crime cases that were related to domestic violence by month. Crimes were classified as cases of domestic violence if they were reported as domestic violence or aggravated domestic assault in the CLEAR dataset.
 
 ```{r crime and domestic violence cases each day over the whole period}
@@ -311,12 +326,14 @@ Note: the dramatic spike in graph 2 (May 31st) and dip in graph 3 (May) can be e
 
 #### Chi-Square Test
 &nbsp;
+
 Next, we assessed whether the relationship between these fluctuations in the proportion of domestic violence cases and quarantine status was statistically significant using a chi-square test of independence.
 
 In order to simplify the analysis, we generalized the 6 phases of the pandemic into 3 periods: pre-lockdown (BEFORE COVID-19 and BEFORE LOCKDOWN), during lockdown (LOCKDOWN and PHASE 2), and post-lockdown (PHASE 3 and PHASE 4). These 3 periods served as our time categories for our chi-square test. Since there were enough independent observations in each period (n>10 for each cell) to satisfy the model assumptions, we conducted a chi-square test at the $\alpha$  = 0.05 significance level, which tests the two hypotheses below: 
 
-H~0 : The proportion of crime cases that were domestic violence in Chicago is unrelated to the 3 periods of the pandemic. &nbsp;
-H~1 : The proportion of crime cases that were domestic violence in Chicago is related to the 3 periods of the pandemic. 
+H~0~: The proportion of crime cases that were reported as domestic violence in Chicago is unrelated to the 3 periods of the pandemic. &nbsp;
+
+H~1~: The proportion of crime cases that were reported as domestic violence in Chicago is related to the 3 periods of the pandemic. 
 
 ```{r chisquared test}
 table(domvio_mut$isdomviolence, domvio_mut$PERIOD)
@@ -325,6 +342,7 @@ chisq.test(table(domvio_mut$isdomviolence, domvio_mut$PERIOD))
 
 #### Step Down 2 Proportion Z-Tests
 &nbsp;
+
 Given the significant p-value of our chi-square test statistic, we conducted three step-down 2 sample tests of proportion to identify any pairwise differences between periods.
 
 For each test, our null hypothesis was that the proportion of crimes reported as domestic violence of the periods of interest was the same, while the alternative hypothesis was that the proportion of crimes reported as domestic violence of the periods of interest was different.
@@ -346,6 +364,7 @@ prop.test(x=c(4311,17919),n=c(35420, 17919+157397), alternative="two.sided", con
 
 #### Regression Analysis
 &nbsp;
+
 Knowing that there is a general difference between the proportion of crimes reported that were related to domestic violence in relation to the lockdown status of the city, we moved to quantify the relationship with a logistic regression model. Here, we aimed to answer the question: how much more likely was a reported crime to be related to domestic violence, given the phase in which it occurred?
 
 The logistic regression below models the relationship between the logit of the probability that a case was an incidence of domestic violence (a “success”) given the phase of the pandemic in which it occurred. In order to control for an expected increase in incidences of domestic violence outside of the 9-to-5 time period (when individuals are either more likely to be at work or outside the home) before strict quarantine, our model included dummy variables for the time of the day as well as the phase of the pandemic (BEFORE COVID-19, BEFORE LOCKDOWN, LOCKDOWN, PHASE 2, PHASE 3, and PHASE 4) in which the crime was reported. BEFORE COVID-19 was used as the reference baseline category for the phase, while occurrence of a crime outside of the 9-to-5 period was used as the baseline category for time of day. We hypothesized that a crime was more likely to be related to domestic violence if it occurred outside of the 9am to 5pm period and/or during the lockdown phases. Additionally, we expected to see a decrease of the probability of success (i.e. that a case reported related to domestic violence) as the city of Chicago began to gradually reopen in recovery phases 2, 3, and 4.
@@ -451,25 +470,30 @@ PHASE 4: (1.210, 1.393)
 
 #### Chi-square test
 &nbsp;
+
 Under the null hypothesis, our test statistic has a chi-square distribution with 2 degrees of freedom and corresponds to a p-value of < 0.001. Thus, at an $\alpha$ = 0.05 significance level, we reject the null hypothesis; there is sufficient evidence to suggest that the proportion of crime cases that were domestic violence in Chicago is related to the periods of the pandemic.
 
 #### Step Down 2 Proportion Z-Tests
 &nbsp;
+
 To account for multiple comparisons, we performed the Bonferroni correction and thus assessed our results relative to the adjusted $\alpha$ = 0.05/3 level. At the adjusted $\alpha$ = 0.05/3 level, we found all three pairwise differences in the proportion of crimes reported as domestic violence to be statistically significant. That is, there is sufficient evidence to suggest that the proportion of crime cases that were related to domestic violence in Chicago differs between each period of the pandemic. 
 
 We chose to focus in on the last two pairwise comparisons (post lockdown vs. pre lockdown and during lockdown vs. pre lockdown), where the respective 95% confidence intervals of (0.0245, 0.0343) and (0.0158, 0.0232) were positive. This suggests that the proportion of crime cases that were domestic violence has increased since issuance of stay-at-home orders. 
 
 #### Regression Analysis
 &nbsp;
+
 Our fitted logistic regression model, where each predictor corresponds to the predicted logit of the probability of success (i.e. a reported crime being related to domestic violence) of our outcome, conditionally on all other variables, is as follows:
 
 $\hat{\beta}_0$ + $\hat{\beta}_1$ * (PHASE == before-lockdown) + $\hat{\beta}_2$ * (PHASE==lockdown) + $\hat{\beta}_3$ * (PHASE==phase2) + $\hat{\beta}_4$ * (PHASE==phase3) + $\hat{\beta}_5$ * (PHASE == phase4) + $\hat{\beta}_6$ * (is9_5)
 
-At the $\alpha$ = 0.05 significance level, the fitted $\beta$ coefficients for each of our dummy variables relative to the baseline category of BEFORE COVID-19 were statistically significant, as was the fitted slope coefficient corresponding to the logit of the probability of success during the 9-to-5 workday, relative to the baseline category of not 9-to-5 workday (i.e. outside this window of time). Therefore, there is sufficient evidence to suggest that the true slope corresponding to each predictor is not equal to 0. There is some relationship between the nature of the crime (i.e. domestic violence or not domestic violence) and the phase in which the crime occurred, as well as time of day, conditional on the other variables. 
+At the $\alpha$ = 0.05 significance level, the fitted $\beta$ coefficients for each of our dummy variables relative to the baseline category of BEFORE COVID-19 were statistically significant, as was the fitted slope coefficient corresponding to the logit of the probability of success during the 9-to-5 workday, relative to the baseline category of not 9-to-5 workday (i.e. outside this window of time). Therefore, there is sufficient evidence to suggest that the true slope corresponding to each predictor is not equal to 0. There is some relationship between the nature of the crime (i.e. domestic violence or not domestic violence) and the phase in which the crime occurred, as well as time of day, conditional on the other variables.
+
 We were specifically interested in $\beta_2$, which corresponds to the logit of the probability of success that a reported crime was related to domestic violence during lockdown, as compared to before the epidemic hit Chicago:
 
-H~0: $\beta_2$ = 0 
-H~1: $\beta_2$ $\neq$ 0
+H~0~: $\beta_2$ = 0 
+
+H~1~: $\beta_2$ $\neq$ 0
 
 Under the null hypothesis, our test statistic follows a standard normal distribution. The value of our test statistic is equal to approximately 12.426, which corresponds to a p-value of < 0.001. Thus, at the $\alpha$ = 0.05, we reject our null hypothesis; we have sufficient evidence to suggest that the true value of $\beta_2$ $\neq$ 0, and that there is a relationship between the lockdown phase and the logit of the probability that a reported case is related to domestic violence, while holding time of day constant.
 
@@ -495,6 +519,7 @@ Finally, it might also be interesting to continue to follow rates of domestic vi
 
 ## REFERENCES
 &nbsp;
+
 [1] Taub, A. (2020, April 06). A New Covid-19 Crisis: Domestic Abuse Rises Worldwide. Retrieved from https://www.nytimes.com/2020/04/06/world/coronavirus-domestic-violence.html
 
 [2] Crimes - One year prior to present: City of Chicago: Data Portal. (2020, July 29). Retrieved from https://data.cityofchicago.org/Public-Safety/Crimes-One-year-prior-to-present/x2n5-8w5q
