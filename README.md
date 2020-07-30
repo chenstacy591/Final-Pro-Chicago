@@ -32,5 +32,5 @@ isphase3: Indicator value for if crime happened during phase 3 of the pandemic (
 isphase4: Indicator value for if crime happened during phase 4 of the pandemic (2020/6/26-2020/7/8) 0=no; 1=yes
 isdomviolence: Indicator value for if crime is domestic violence 0=no; 1=yes
 is9_5: Indicator value for if crime happened during normal workday hourse 9am-5pm 0=no; 1=yes
-chisquare_indicators: Period of crime (pre=isbeforecovid or isprelockdown; during=islockdown or isphase2; post=isphase3 or isphase4)
-logistic_indicators: Phase of crime (before_covid, pre-lockdown, lockdown, phase 2, phase 3, phase 4)
+PERIOD: Period of crime (pre=isbeforecovid or isprelockdown; during=islockdown or isphase2; post=isphase3 or isphase4)
+PHASE: Phase of crime (before_covid, pre-lockdown, lockdown, phase 2, phase 3, phase 4)
